@@ -1,0 +1,5 @@
+- Prefers the React + TypeScript + Next.js stack for web development, using Tailwind CSS for styling. Confidence: 0.95
+- Wants an AI-assisted development workflow — uses AI as a development co-pilot for scaffolding, building, debugging, and refining code. Confidence: 0.9
+- Interested in AI agent SDK frameworks (e.g., Vercel Agent SDK / "Agent Stack") specifically for embedding AI features (chatbots, AI copy) into client sites as a sellable upsell — but treats them as advanced tooling layered on top of fundamentals, not a substitute for learning components/props/state. Confidence: 0.8
+- Has a basic background in JavaScript, Laravel (PHP), HTML, and CSS — not starting from zero, concepts can be connected to existing frames. Confidence: 0.9
+- Delegates git/CLI repository operations to the agent autonomously — expects the agent to check environment state, install missing CLI tools (e.g., gh via winget), handle authentication, and execute repo creation and pushing without being walked through intermediate steps. Confidence: 0.8

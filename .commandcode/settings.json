@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Shell(ls:*)",
+      "Shell(findstr:*)",
+      "Shell(npm:*)",
+      "Shell(uipro:*)",
+      "Shell(python \".claude/skills/ui-ux-pro-max/scripts/search.py\" \"industrial dark technical engineering cyber-physical\" --domain style -n 5 2>&1)",
+      "Shell(gh:*)",
+      "Shell(where:*)",
+      "Shell(dir:*)",
+      "Shell(C:\\Program Files\\GitHub CLI\\gh.exe:*)",
+      "Shell(echo %GH_TOKEN% 2>&1; echo %GITHUB_TOKEN% 2>&1)",
+      "Shell(set:*)",
+      "Shell(C:Program:*)",
+      "Shell(git:*)"
+    ],
+    "deny": [],
+    "defaultMode": "default"
+  }
+}

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 2 — Deploy Live</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav class="lesson">
+  <a href="0001-component-model.html">Lesson 1</a> ·
+  <a href="../MISSION.md">Mission</a> ·
+  Lesson 2 — "Build &amp; Sell Next.js Landing Pages"
+</nav>
+
+<h1>Lesson 2: Deploy Live in One Click</h1>
+<p class="sidenote">Weekend 1, part 2. One win: a public URL your future clients can open right now.</p>
+
+<p>A site that only runs on your computer cannot be sold. Vercel deploys Next.js in a single step. <span class="sidenote">This is the same tool Next.js is built by, so the defaults are already optimal.</span></p>
+
+<h2>Option A — Git + dashboard (recommended first time)</h2>
+<ol class="lr">
+  <li>Inside your <code>landing</code> project, commit everything to GitHub (private is fine):</li>
+</ol>
+<pre><code>git init
+git add -A
+git commit -m "landing: first hero"
+git branch -M main
+git remote add origin https://github.com/YOU/landing.git
+git push -u origin main</code></pre>
+<ol start="2" class="lr">
+  <li>Open <a href="https://vercel.com/new">vercel.com/new</a>, import your repo, leave every default, and click <strong>Deploy</strong>.</li>
+  <li>Copy the <code>*.vercel.app</code> URL. Paste it into a private browser tab &mdash; your Hero is live on the internet.</li>
+</ol>
+
+<h2>Option B — Vercel CLI (faster after lesson 1)</h2>
+<pre><code>npm i -g vercel
+vercel          # first time only — it links the project
+vercel --prod   # every deploy after</code></pre>
+
+<h2>Checklist — weekend done when</h2>
+<ul class="checklist">
+  <li>Your public URL loads in a browser you are not logged into.</li>
+  <li>The Hero button toggles the pricing line (state works in production).</li>
+  <li>You bookmarked the deploy command so next time is one line.</li>
+</ul>
+
+<h2>Quiz</h2>
+<div class="quiz" id="quiz">
+  <p>Vercel deploys Next.js by default as what kind of site?</p>
+  <label><input type="radio" name="q1" value="a"> A static + server site</label>
+  <label><input type="radio" name="q1" value="b"> A pure client bundle</label>
+  <label><input type="radio" name="q1" value="c"> A server-only PHP app</label>
+  <label><input type="radio" name="q1" value="d"> A local PDF document</label>
+  <button type="button" onclick="c2()">Check</button>
+  <div id="fb" class="feedback"></div>
+</div>
+<script>
+function c2() {
+  var a = document.querySelector('input[name="q1"]:checked');
+  var fb = document.getElementById('fb');
+  if (!a) { fb.textContent = 'Pick an answer.'; fb.style.color = '#e53935'; return; }
+  fb.textContent = (a.value === 'a')
+    ? '\u2714 Correct — Vercel prerenders pages to static where possible and runs server code where needed. That mix is what ships fast and cheap.'
+    : '\u2717 Wrong — Vercel is built for Next.js, not PHP or pure client bundles.';
+  fb.style.color = (a.value === 'a') ? '#1e8e3f' : '#e53935';
+}
+</script>
+
+<h2>Primary source</h2>
+<ul class="lr">
+  <li><a href="https://nextjs.org/docs/app/building-your-application/deploying">Next.js Deploying docs</a></li>
+  <li><a href="https://vercel.com/docs">Vercel docs</a></li>
+</ul>
+
+<p class="sidenote">Companion: <a href="../reference/0001-nextjs-commands.html">Reference: Next.js Commands</a>.</p>
+
+<footer class="lesson">
+  <p><strong>Next (weekend 2):</strong> build the full landing page &mdash; Hero, Features, Pricing, CTA as reusable components, then style it.</p>
+  <p><strong>Questions for your teacher?</strong> Ask anything &mdash; a step failed, a term is fuzzy, or your URL is broken. I am here.</p>
+</footer>
+
+</body>
+</html>

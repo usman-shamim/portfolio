@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 1 — The Component Model</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav class="lesson">
+  <a href="../RESOURCES.md">Resources</a> ·
+  <a href="../MISSION.md">Mission</a> ·
+  Lesson 1 — "Build &amp; Sell Next.js Landing Pages"
+</nav>
+
+<h1>Lesson 1: Build Your First Component</h1>
+<p class="sidenote">Weekend 1, part 1. One win: a real React component running on your own computer.</p>
+
+<p>A Next.js page is just a React <strong>component</strong>. If you can read a function and write HTML, you can edit any page. This lesson teaches the three ideas that unlock everything: <strong>components</strong>, <strong>props</strong>, and <strong>state</strong>. <span class="sidenote">Per the <a href="https://nextjs.org/learn/dashboard-app/creating-layouts-and-pages">official course</a>, a <code>page.tsx</code> "exports a React component" — so a page is a function. Everything below is that same idea, in a reusable box.</span></p>
+
+<h2>Step 0 — Create the project</h2>
+<p>This one command makes a full Next.js + TypeScript starter. It is your blank canvas for every site you sell.</p>
+<pre><code>npx create-next-app@latest landing --ts --app
+cd landing
+npm run dev</code></pre>
+<p class="sidenote">Open <a href="http://localhost:3000">http://localhost:3000</a>. You see the default page — that is <code>app/page.tsx</code>, your first component.</p>
+
+<h2>Concept 1 — A component is a function</h2>
+<p>A component is a JavaScript function that <em>returns JSX</em>. JSX looks like HTML but lives inside JavaScript. Compare to what you already know:</p>
+
+<div class="sidenote">You know HTML. JSX is HTML with two rules: (1) <code>class</code> becomes <code>className</code>, (2) most tags close themselves: <code>&lt;br /&gt;</code>. You will not memorize these — the editor highlights them.</div>
+
+<pre><code>// A plain JS function you might write in Laravel/PHP:
+// function heading($t) { return "&lt;h1&gt;$t&lt;/h1&gt;"; }
+
+// A React component (note the capital letter — required):
+function Hero() {
+  return &lt;h1&gt;Acme Plumbing&lt;/h1&gt;;
+}</code></pre>
+
+<h2>Concept 2 — Props are inputs</h2>
+<p>Props are how you pass information <em>into</em> a component — exactly like a function argument. That means one <code>Hero</code> works for "Acme Plumbing" <em>and</em> "Bella Coffee" by passing a different title:</p>
+
+<pre><code>function Hero({ title }) {
+  return &lt;h1&gt;{title}&lt;/h1&gt;;
+}
+// &lt;Hero title="Acme Plumbing" /&gt;
+// &lt;Hero title="Bella Coffee" /&gt;</code></pre>
+<p class="sidenote">The curly braces <code>{title}</code> are a JSX expression — "print the variable here". This is the bridge between your JS knowledge and the page.</p>
+
+<h2>Concept 3 — State makes it interactive</h2>
+<p>Props come from outside; <strong>state</strong> is memory <em>inside</em> a component. When state changes, the component re-renders. <code>useState</code> creates that memory:</p>
+
+<pre><code>import { useState } from 'react';
+
+function Hero({ title }) {
+  const [showDetails, setShowDetails] = useState(false);
+
+  return (
+    &lt;section&gt;
+      &lt;h1&gt;{title}&lt;/h1&gt;
+      &lt;button onClick={() =&gt; setShowDetails(!showDetails)}&gt;
+        {showDetails ? 'Hide' : 'Show'} pricing
+      &lt;/button&gt;
+      {showDetails &amp;&amp; &lt;p&gt;Book today for 10% off.&lt;/p&gt;}
+    &lt;/section&gt;
+  );
+}</code></pre>
+
+<div class="note">
+  <strong>Read this line by line if it is new:</strong>
+  <code>useState(false)</code> starts a memory slot as <code>false</code>.
+  <code>{showDetails &amp;&amp; &lt;p&gt;...&lt;/p&gt;}</code> renders the paragraph only when <code>showDetails</code> is true.
+  <code>setShowDetails(!showDetails)</code> flips it — and the button relabels itself <em>automatically</em>. That is reactivity.
+</div>
+
+<h2>Hands-on — make it yours</h2>
+<p>Create the file <code>components/Hero.tsx</code> and paste the TypeScript version below. <span class="sidenote">The <code>.tsx</code> means JSX + TypeScript. <code>'use client'</code> tells Next.js this component uses browser reactivity (state). The <code>interface</code> type-checks the <code>title</code> prop so typos crash at compile time, not in a client's browser.</span></p>
+
+<pre><code>'use client';
+
+import { useState } from 'react';
+
+interface HeroProps {
+  title: string;
+}
+
+export default function Hero({ title }: HeroProps) {
+  const [showDetails, setShowDetails] = useState(false);
+
+  return (
+    &lt;section&gt;
+      &lt;h1&gt;{title}&lt;/h1&gt;
+      &lt;button onClick={() =&gt; setShowDetails(!showDetails)}&gt;
+        {showDetails ? 'Hide' : 'Show'} pricing
+      &lt;/button&gt;
+      {showDetails &amp;&amp; &lt;p&gt;Book today for 10% off.&lt;/p&gt;}
+    &lt;/section&gt;
+  );
+}</code></pre>
+
+<p>Now wire it into the home page. Replace <code>app/page.tsx</code> entirely with:</p>
+<pre><code>import Hero from '@/components/Hero';
+
+export default function Home() {
+  return (
+    &lt;main&gt;
+      &lt;Hero title="Acme Plumbing — 24h Fast Service" /&gt;
+    &lt;/main&gt;
+  );
+}</code></pre>
+<p>Save both files. Your browser reloads. Click the button. <span class="sidenote">If it does not reload, restart <code>npm run dev</code>.</span></p>
+
+<h2>How to have an AI build this for you</h2>
+<pre><code>Write a TypeScript React component file components/Hero.tsx for a Next.js
+App Router project. It must:
+- Accept a single string prop `title` (type it with an interface).
+- Render an <h1> with the title.
+- Have a <button> that toggles a paragraph on/off using useState.
+- Start the file with 'use client'.
+- Plain JSX only — no Tailwind, no CSS files.
+Return ONLY the file content.</code></pre>
+
+<h2>Quiz — check your grasp</h2>
+<p class="sidenote">Answers reveal themselves on submit. Option lengths are matched so you cannot guess from the formatting.</p>
+<div class="quiz" id="quiz">
+  <p>1. In a <code>.tsx</code> file, what is JSX?</p>
+  <label><input type="radio" name="q1" value="a"> HTML written inside JavaScript</label>
+  <label><input type="radio" name="q1" value="b"> CSS written inside TypeScript</label>
+  <label><input type="radio" name="q1" value="c"> SQL written inside a database</label>
+  <label><input type="radio" name="q1" value="d"> XML written inside an editor</label>
+
+  <p>2. How do you pass info into a React component?</p>
+  <label><input type="radio" name="q2" value="a"> Via props like function arguments</label>
+  <label><input type="radio" name="q2" value="b"> Via state like database queries</label>
+  <label><input type="radio" name="q2" value="c"> Via CSS like class selectors</label>
+  <label><input type="radio" name="q2" value="d"> Via hooks like event listeners</label>
+
+  <p>3. What does useState give a component?</p>
+  <label><input type="radio" name="q3" value="a"> A reactive variable</label>
+  <label><input type="radio" name="q3" value="b"> A static function</label>
+  <label><input type="radio" name="q3" value="c"> A database query</label>
+  <label><input type="radio" name="q3" value="d"> A server config</label>
+
+  <button type="button" onclick="checkQuiz()">Check answers</button>
+  <div id="fb" class="feedback"></div>
+</div>
+
+<script>
+function checkQuiz() {
+  var a1 = document.querySelector('input[name="q1"]:checked');
+  var a2 = document.querySelector('input[name="q2"]:checked');
+  var a3 = document.querySelector('input[name="q3"]:checked');
+  var fb = document.getElementById('fb');
+  if (!a1 || !a2 || !a3) { fb.textContent = 'Answer all three first.'; fb.style.color = '#e53935'; return; }
+  var out = '';
+  out += (a1.value === 'a') ? '\u2714 JSX is HTML-in-JavaScript. Correct.\n' : '\u2717 Wrong \u2014 re-read the JSX box. Try again.\n';
+  out += (a2.value === 'a') ? '\u2714 Props are how info enters a component. Correct.\n' : '\u2717 Wrong \u2014 props are component inputs, not CSS or hooks.\n';
+  out += (a3.value === 'a') ? '\u2714 State triggers a re-render. Correct.' : '\u2717 Wrong \u2014 useState holds a reactive variable inside the component.';
+  var correct = (a1.value === 'a' && a2.value === 'a' && a3.value === 'a');
+  fb.textContent = out;
+  fb.style.color = correct ? '#1e8e3f' : '#e53935';
+}
+</script>
+
+<h2>Primary source</h2>
+<p>Ground-truth the concepts above in the official React Foundations course:</p>
+<ul class="lr">
+  <li><a href="https://nextjs.org/learn/react-foundations/what-is-react-and-nextjs">Ch 1 — About React and Next.js</a> (what a framework adds)</li>
+  <li><a href="https://nextjs.org/learn/react-foundations/rendering-ui">Ch 2 — Rendering UI (components + JSX)</a></li>
+  <li><a href="https://nextjs.org/learn/react-foundations/from-react-to-nextjs">Ch 8 — From React to Next.js</a> (confirms: props + state are the essentials)</li>
+</ul>
+<p class="sidenote">See also the <a href="../reference/0002-components.html">Components cheat sheet</a> — the compressed essence of this lesson, for your desk.</p>
+
+<footer class="lesson">
+  <p>Done for now. <strong>Next:</strong> deploy this page live in <a href="0002-deploy-live.html">Lesson 2</a> so a client can see it.</p>
+  <p><strong>Stuck or unsure?</strong> Ask your teacher anything &mdash; a command failed, a term is fuzzy, or you want to know why <code>'use client'</code> matters. I am here to help.</p>
+</footer>
+
+</body>
+</html>

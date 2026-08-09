@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reference: Next.js Commands</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav class="lesson">
+  <a href="../lessons/0001-scaffold-and-deploy.html">Lesson 1</a> ·
+  <a href="../RESOURCES.md">Resources</a> ·
+  Reference: Next.js Commands
+</nav>
+
+<h1>Next.js Commands Cheat Sheet</h1>
+<p class="sidenote">Compressed essence of Lesson 1. Print this page and keep it beside your keyboard.</p>
+
+<h2>Scaffold a new project</h2>
+<pre><code>npx create-next-app@latest landing --ts --app</code></pre>
+<p class="sidenote"><code>landing</code> = project folder. <code>--ts</code> = TypeScript. <code>--app</code> = App Router (modern routes).</p>
+
+<h2>Run locally</h2>
+<pre><code>cd landing
+npm run dev
+# opens at http://localhost:3000</code></pre>
+
+<h2>Deploy to Vercel</h2>
+<h3>One-time CLI setup</h3>
+<pre><code>npm i -g vercel
+vercel</code></pre>
+<h3>Every deploy after</h3>
+<pre><code>vercel --prod</code></pre>
+
+<h2>Deploy via GitHub (no CLI)</h2>
+<ol class="lr">
+  <li><code>cd landing &amp;&amp; git init &amp;&amp; git add -A &amp;&amp; git commit -m "first"</code></li>
+  <li>Git push to a GitHub repo (private is fine).</li>
+  <li>Import that repo at <a href="https://vercel.com/new">vercel.com/new</a> &mdash; leave defaults, click Deploy.</li>
+  <li>Copy the <code>*.vercel.app</code> URL it assigns you.</li>
+</ol>
+
+<h2>Key file: the home page</h2>
+<pre><code>app/page.tsx</code></pre>
+<p class="sidenote">This is the route for <code>/</code>. Edit it, save, browser reloads instantly. Every page lives under <code>app/</code> as <code>page.tsx</code> (plus optional <code>layout.tsx</code>).</p>
+
+<h2>Common pitfalls</h2>
+<ul class="lr">
+  <li>If <code>npx</code> is not found: install Node.js 18+ from <a href="https://nodejs.org">nodejs.org</a>.</li>
+  <li>If port 3000 is busy: the terminal offers another port — use it.</li>
+  <li>If Vercel asks to "Link to existing project": type <code>no</code> and re-run <code>vercel</code> inside your project folder.</li>
+</ul>
+
+<footer class="lesson">
+  <p>Updated from <a href="../lessons/0001-scaffold-and-deploy.html">Lesson 1</a> &mdash; <a href="../RESOURCES.md">Resources</a></p>
+</footer>
+
+</body>
+</html>

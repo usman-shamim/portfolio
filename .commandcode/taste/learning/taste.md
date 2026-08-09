@@ -1,0 +1,5 @@
+- Learning is commercially driven — goal is to build and sell websites, so prefers practical, product-oriented learning over abstract theory. Confidence: 0.95
+- Lessons must be grounded in the official Next.js Learn curriculum rather than bespoke checklists — treats nextjs.org/learn as the authoritative reference. Confidence: 0.85
+- Rejects shallow first lessons — wants real concepts (components, JSX, props, state) taught from the start, not just deploy commands. Confidence: 0.85
+- Seeks evidence-based, comparative guidance on dev-tool and approach choices — phrases questions as "tell me if X would be better" and expects researched, source-backed answers rather than gut reactions. Confidence: 0.8
+- Honestly acknowledges beginner-level knowledge in new technical skills (e.g., Python) rather than inflating proficiency, and prefers incremental, milestone-based progression with concrete deliverables — e.g., "build one file tonight (20 lines), add one feature next week" — over abstract advice. Comfortable treating portfolio projects as learning roadmaps that grow alongside skill development. Confidence: 0.85

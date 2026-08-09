@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reference: Components & JSX</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav class="lesson">
+  <a href="../lessons/0001-component-model.html">Lesson 1</a> ·
+  <a href="../lessons/0002-deploy-live.html">Lesson 2</a> ·
+  Reference: Components &amp; JSX
+</nav>
+
+<h1>Components &amp; JSX Cheat Sheet</h1>
+<p class="sidenote">Compressed essence of Lesson 1. Print and keep beside your keyboard.</p>
+
+<h2>A component is a function</h2>
+<pre><code>function Button() {
+  return &lt;button&gt;Click&lt;/button&gt;;
+}
+// Capital letter is REQUIRED so JSX treats it as a component.</code></pre>
+
+<h2>Props = inputs</h2>
+<pre><code>function Hero({ title }: { title: string }) {
+  return &lt;h1&gt;{title}&lt;/h1&gt;;
+}
+&lt;Hero title="Acme" /&gt;</code></pre>
+<p class="sidenote">JSX expression <code>{title}</code> prints the variable. Props are how info enters a component.</p>
+
+<h2>State = memory (reactivity)</h2>
+<pre><code>'use client';
+import { useState } from 'react';
+
+function Toggle() {
+  const [on, setOn] = useState(false);
+  return (
+    &lt;button onClick={() =&gt; setOn(!on)}&gt;
+      {on ? 'On' : 'Off'}
+    &lt;/button&gt;
+  );
+}</code></pre>
+
+<h2>TypeScript typing for props</h2>
+<pre><code>interface CardProps {
+  title: string;
+  price?: number;      // optional prop
+  onBuy: () =&gt; void;
+}</code></pre>
+
+<h2>Conditional rendering</h2>
+<pre><code>{show &amp;&amp; &lt;p&gt;Visible&lt;/p&gt;}
+{count &gt; 0 ? 'cart full' : 'empty'}
+{items.length === 0 &amp;&amp; &lt;p&gt;No items&lt;/p&gt;}</code></pre>
+
+<h2>List rendering</h2>
+<pre><code>{items.map((item) =&gt; (
+  &lt;li key={item.id}&gt;{item.name}&lt;/li&gt;
+))}</code></pre>
+<p class="sidenote"><code>key</code> is required when mapping — it lets React update lists efficiently.</p>
+
+<h2>Two JSX rules to remember</h2>
+<ul class="lr">
+  <li><code>class=</code> becomes <code>className=</code>.</li>
+  <li>Self-close void tags: <code>&lt;br /&gt;</code>, <code>&lt;img /&gt;</code>.</li>
+</ul>
+
+<h2>Importing a component</h2>
+<pre><code>// components/Hero.tsx → import with the @ alias
+import Hero from '@/components/Hero';
+&lt;Hero title="Hi" /&gt;</code></pre>
+
+<h3>Rules</h3>
+<ul class="lr">
+  <li>Any file using <code>useState</code>, <code>onClick</code>, or other browser APIs must start with <code>'use client';</code>.</li>
+  <li>Next.js page files are <code>app/page.tsx</code> (route <code>/</code>), <code>app/about/page.tsx</code> (route <code>/about</code>).</li>
+</ul>
+
+<footer class="lesson">
+  <p>Updated from <a href="../lessons/0001-component-model.html">Lesson 1</a> &mdash; <a href="../RESOURCES.md">Resources</a></p>
+</footer>
+
+</body>
+</html>
