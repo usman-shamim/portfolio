@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -12,16 +12,26 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+/* An absolute base so the social card resolves off-domain. Set
+   NEXT_PUBLIC_SITE_URL at deploy; localhost is the fallback. */
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
 export const metadata: Metadata = {
-  title: "M. Usman Shamim — Forward Deployed Engineer",
+  metadataBase: new URL(siteUrl),
+  title: "M. Usman Shamim, forward deployed engineer",
   description:
-    "Bridging chemical-technology engineering and agentic AI. Portfolio of an Industry 4.0 Forward Deployed Engineer specializing in AI agents, process automation, and industrial intelligence.",
+    "Forward deployed engineer combining chemical-technology engineering with AI-agent architecture. I build agents, workflow automation and voice systems for process plants and service businesses.",
   openGraph: {
-    title: "M. Usman Shamim — Forward Deployed Engineer",
+    title: "M. Usman Shamim, forward deployed engineer",
     description:
-      "Chemical-Tech AI Specialist building the bridge between plant floors and agentic intelligence.",
+      "Agents, workflow automation and voice systems for process plants and service businesses.",
     type: "website",
   },
+  twitter: { card: "summary_large_image" },
+};
+
+export const viewport: Viewport = {
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -30,7 +40,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100">
+      <body className="min-h-full flex flex-col bg-ground text-ink">
+        {/* The reveal is gated on JavaScript. Without this, a visitor with
+            scripting off would see the sections stay at opacity 0. */}
+        <noscript>
+          <style>{`.reveal,.stagger>*{opacity:1}`}</style>
+        </noscript>
         {children}
       </body>
     </html>
