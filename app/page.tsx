@@ -1,291 +1,490 @@
 import {
-  Navbar, AuroraBackground, ParticleField, Scanlines,
-  SectionReveal, SectionRevealStagger, SectionHeader,
-  HUDBrackets, Badge, SkillBar, TechTag,
-  ProjectCard, ComingSoonCard, TechMatrix, HUDStats,
-  ContactButton,
+  Navbar,
+  Field,
+  SkipLink,
+  Reveal,
+  ServicesList,
+  SectionHeader,
+  StatusMark,
+  Tag,
+  Ledger,
+  Row,
+  DefList,
+  ServiceStrip,
+  StackMap,
+  ContactAction,
+  CopyEmail,
+  LinkedInIcon,
+  EmailIcon,
+  GitHubIcon,
 } from "./components";
+
+const EMAIL = "usman2007.ap@gmail.com";
+
+const SERVICES = [
+  {
+    name: "AI agents",
+    detail: "Design, build and deploy agentic systems: tool-calling agents, MCP integrations, guardrails, and typed output a downstream system can act on.",
+    forWho: "teams automating a repeated decision",
+  },
+  {
+    name: "Workflow automation",
+    detail: "n8n workflows that connect the systems you already run, so data moves between them without a person copying it.",
+    forWho: "teams losing hours to manual handoffs",
+  },
+  {
+    name: "Web development",
+    detail: "Sites and web applications, from a single landing page to an internal tool with a real backend.",
+    forWho: "businesses with no web presence, or a poor one",
+  },
+  {
+    name: "Voice receptionist",
+    detail: "A voice agent that answers your calls: books the appointment, takes the address and the problem, triages what is urgent and hands the rest to your team. Built on Pipecat for real-time speech.",
+    forWho: "contractors, clinics, and any business that lives on the phone",
+  },
+];
+
+const AGENTIC = [
+  { term: "Agent development", detail: "Claude Code, MCP and the agent SDKs, working through the 86-chapter AI Agent Factory curriculum." },
+  { term: "Agent architecture", detail: "Handoffs between specialists, cloned agents with their own instructions, and tool sets that change by tier." },
+  { term: "Guardrails and typed output", detail: "Answers checked against the underlying record before they are returned, and results a downstream system can act on." },
+  { term: "Cited retrieval", detail: "Answers over governed documents with the source attached, and an explicit abstention when the record does not cover the question." },
+  { term: "Model routing", detail: "Provider and model held as configuration, so cost and billing can move without touching agent code." },
+  { term: "Backend and data", detail: "Python pipelines, SQL and real-time analytics behind the agent layer." },
+];
+
+const PLANT = [
+  { term: "Chemical process grounding", detail: "DAE in chemical technology: unit operations, process flow and control fundamentals." },
+  { term: "Reactor and loop monitoring", detail: "Cooling loops, pressure and temperature thresholds, and the alarm logic that sits on top of them." },
+  { term: "Plant monitoring software", detail: "Threshold and alarm logic, sensor history and fault classification in a desktop SCADA-style dashboard." },
+  { term: "Agentic SCADA", detail: "AgriAgent: perception, formulation and actuation agents over MCP, driving an MQTT digital twin." },
+  { term: "Predictive maintenance", detail: "Degradation features and models for rotating equipment, fed by sensor history." },
+  { term: "MQTT and edge actuation", detail: "Publish and subscribe between plant devices and services, driving an ESP32 dosing rig." },
+];
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#020617] text-[#f8fafc]">
-      <AuroraBackground />
-      <ParticleField />
-      <Scanlines />
+    <div className="gutter min-h-screen text-ink">
+      <Field />
+      <SkipLink />
       <Navbar />
 
+      {/* tabIndex -1 makes the landmark a real focus target for the skip link. */}
+      <main id="main" tabIndex={-1}>
+
       {/* ── Hero ── */}
-      <section className="relative flex min-h-screen flex-col justify-center px-6 pt-20">
+      <section id="top" className="relative pb-20 pt-28 md:pb-28 md:pt-36">
         <div className="mx-auto w-full max-w-6xl">
-          <div className="mb-8 font-mono text-[11px] tracking-[0.35em] text-[#22d3ee]/50">
-            <span className="inline-block animate-pulse text-[#22d3ee]/80">●</span> SYS.ONLINE — FORWARD DEPLOYED ENGINEER
+          <p className="hero-chunk mono mb-6 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] uppercase tracking-[0.22em] text-ink-3">
+            <span className="text-signal">Forward deployed engineer</span>
+            <span aria-hidden="true">/</span>
+            <span>Chemical technology + agentic AI</span>
+          </p>
+
+          <h1 className="hero-chunk max-w-3xl text-3xl font-semibold leading-[1.08] tracking-tight text-ink sm:text-5xl lg:text-7xl">
+            M. Usman Shamim
+          </h1>
+
+          <p className="hero-chunk mt-6 max-w-2xl text-base leading-[1.6] text-ink-2 sm:text-lg">
+            I build AI systems for process plants and for service businesses. Operators get agents
+            that watch reactor loops, answer procedure questions with the source attached and flag
+            drift before it becomes an alarm. Contractors get an agent that answers the phone. My
+            grounding is chemical technology, and everything below is a system I built and can
+            show you.
+          </p>
+
+          <div className="hero-chunk mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <a
+              href="#services"
+              className="press inline-flex min-h-12 w-full items-center justify-center border border-signal bg-signal px-5 text-sm font-medium hover:bg-ink hover:border-ink active:scale-[0.98] sm:w-auto"
+            >
+              See what I take on
+            </a>
+            <a
+              href="#work"
+              className="press inline-flex min-h-12 w-full items-center justify-center border border-line-strong px-5 text-sm font-medium text-ink-2 hover:border-signal hover:text-ink active:scale-[0.98] active:bg-raise sm:w-auto"
+            >
+              See the shipped work
+            </a>
           </div>
 
-          <HUDBrackets className="mb-10 max-w-3xl p-10">
-            <h1 className="font-sans text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl lg:text-8xl">
-              M. Usman
+          <div className="hero-chunk mt-14 border-t border-line pt-6">
+            <ServiceStrip />
+          </div>
+
+          <div className="hero-chunk mt-14 border border-line bg-panel p-5">
+            <p className="mono text-xs leading-[1.8] text-ink-3">
+              <span className="text-signal">$</span> whoami
               <br />
-              <span className="bg-gradient-to-r from-[#22d3ee] via-[#67e8f9] to-[#22d3ee] bg-clip-text" style={{ WebkitTextFillColor: "transparent" }}>
-                Shamim
+              <span className="text-ink-2">Forward deployed engineer, chemical technology and agentic AI</span>
+              <br />
+              <span className="text-signal">$</span> cat stack.txt
+              <br />
+              <span className="text-ink-2">
+                Python · OpenAI Agents SDK · MCP · MQTT · FastAPI · Chainlit
               </span>
-            </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-[#94a3b8]">
-              Chemical-Tech AI Specialist bridging industrial plant floors and agentic intelligence. I design AI agents that monitor reactors, orchestrate supply chains, and automate chemical processes — trained at the intersection of <span className="text-[#22d3ee]">Industry 4.0</span> and <span className="text-[#16a34a]">agentic AI</span>.
             </p>
-          </HUDBrackets>
-
-          <div className="flex flex-wrap gap-4">
-            <a href="#contact" className="inline-flex items-center rounded-lg px-6 py-3 text-sm font-semibold transition-all duration-200 hover:-translate-y-px active:scale-[0.98]" style={{ background: "#22d3ee", color: "#020617" }}>Get in touch</a>
-            <a href="#projects" className="inline-flex items-center rounded-lg border px-6 py-3 text-sm font-semibold transition-all duration-200 hover:-translate-y-px" style={{ borderColor: "#334155", color: "#cbd5e1", background: "#0e1223" }}>View projects</a>
-          </div>
-
-          <div className="mt-20"><HUDStats /></div>
-
-          <div className="mt-16 rounded-xl border border-[#1e293b] bg-[#0e1223]/80 p-5 font-mono text-xs leading-relaxed text-[#64748b]">
-            <div><span className="text-[#22d3ee]">$</span> whoami</div>
-            <div className="ml-4 text-[#cbd5e1]">Forward Deployed Engineer — Chemical Tech + Agentic AI</div>
-            <div className="mt-2"><span className="text-[#22d3ee]">$</span> cat /etc/stack</div>
-            <div className="ml-4 flex flex-wrap gap-x-4 gap-y-1"><span className="text-[#22d3ee]">Claude Code</span><span className="text-[#cbd5e1]">MCP/A2A</span><span className="text-[#16a34a]">PLC/SCADA</span><span className="text-[#f59e0b]">n8n</span><span className="text-[#a855f7]">RAG</span><span className="text-[#22d3ee]">LangGraph</span><span className="text-[#cbd5e1]">FastAPI</span><span className="text-[#16a34a]">Siemens S7-1200</span><span className="text-[#f59e0b]">Docker</span></div>
           </div>
         </div>
       </section>
 
-      {/* ── Skills ── */}
-      <section id="skills" className="border-t border-[#1e293b] px-6 py-24">
+      {/* ── 01 Services ── */}
+      <section id="services" className="py-16 sm:py-20 md:py-24">
         <div className="mx-auto max-w-6xl">
-          <SectionHeader label="CAPABILITIES" title="Domain-bridge expertise" subtitle="Operating at the boundary of process engineering and autonomous AI" />
-          <SectionReveal>
-            <div className="grid gap-8 lg:grid-cols-2">
-              <HUDBrackets className="p-6">
-                <div className="mb-6"><Badge color="cyan">MODULE_01: AGENTIC_AI</Badge></div>
-                <SkillBar label="AI Agent Architecture (Claude Code, MCP, Agent SDKs)" pct={85} />
-                <SkillBar label="Prompt & Context Engineering" pct={80} />
-                <SkillBar label="Multi-Agent Orchestration (LangGraph, A2A)" pct={65} />
-                <SkillBar label="RAG Pipelines (Pinecone, Qdrant)" pct={55} />
-                <SkillBar label="Backend AI (FastAPI, Neon DB, Docker)" pct={75} />
-                <SkillBar label="Python + SQL + Real-time Analytics" pct={80} />
-                <div className="mt-4 flex flex-wrap gap-1.5">
-                  {["Claude Code","MCP","A2A","OpenAI SDK","LangChain","LangGraph","RAG","Pinecone","Mem0","LangSmith","Docker","FastAPI","Neon DB","n8n","Spectkit"].map(t=><TechTag key={t} name={t} />)}
-                </div>
-              </HUDBrackets>
+          <SectionHeader
+            index="01"
+            label="Services"
+            title="What I take on"
+            lede="Small engagements, delivered end to end. If the work is better done another way, I will say so before you spend anything."
+          />
 
-              <HUDBrackets className="p-6">
-                <div className="mb-6"><Badge color="green">MODULE_02: INDUSTRIAL_AUTOMATION</Badge></div>
-                <SkillBar label="PLC Programming (Siemens S7-1200)" pct={78} />
-                <SkillBar label="HMI Design & SCADA Systems" pct={70} />
-                <SkillBar label="Industrial Instrumentation" pct={72} />
-                <SkillBar label="Chemical Process Control" pct={75} />
-                <SkillBar label="Predictive Maintenance (ML Models)" pct={60} />
-                <SkillBar label="IIoT Protocols (MQTT, OPC UA)" pct={50} />
-                <div className="mt-4 flex flex-wrap gap-1.5">
-                  {["Siemens S7-1200","SCADA","HMI KTP700","SAP S/4HANA","OPC UA","MQTT","Python","ML","SQL","AutoCAD Elec","Raspberry Pi"].map(t=><TechTag key={t} name={t} />)}
-                </div>
-              </HUDBrackets>
-            </div>
-          </SectionReveal>
+          <ServicesList items={SERVICES} />
         </div>
       </section>
 
-      {/* ── Experience ── */}
-      <section id="experience" className="border-t border-[#1e293b] px-6 py-24">
+      {/* ── 02 Capabilities ── */}
+      <section id="capabilities" className="py-16 sm:py-20 md:py-24">
         <div className="mx-auto max-w-6xl">
-          <SectionHeader label="EXPERIENCE" title="Where I've built" />
-          <SectionReveal>
-            <div className="relative border-l border-[#1e293b] pl-8">
-              <div className="absolute -left-[5px] top-1.5 h-2.5 w-2.5 animate-pulse rounded-full bg-[#22d3ee]" />
-              <div className="mb-2 font-mono text-xs text-[#64748b]">June 2026 — Present</div>
-              <h3 className="text-xl font-semibold">Backend AI Engineering Intern</h3>
-              <p className="font-semibold text-[#22d3ee]">FlyRank AI</p>
-              <p className="mt-3 text-sm leading-relaxed text-[#94a3b8]">Building production AI backends with FastAPI, integrating agent SDKs, and shipping scalable AI-powered services. Working on real-world deployment patterns for agentic systems.</p>
-              <div className="mt-3 flex flex-wrap gap-1.5">{[<TechTag key="f" name="FastAPI" />,<TechTag key="n" name="Neon DB" />,<TechTag key="a" name="Agent SDKs" />,<TechTag key="d" name="Docker" />]}</div>
+          <SectionHeader
+            index="02"
+            label="Capabilities"
+            title="Two disciplines that rarely sit in one person"
+            lede="Each item is something I have built or studied. Where a capability has a system behind it, the system is named."
+          />
+
+          <Reveal>
+            <div className="border border-line bg-panel p-6 md:p-8">
+              <h3 className="mono mb-6 text-[11px] uppercase tracking-[0.18em] text-signal">
+                Agent engineering
+              </h3>
+              <DefList items={AGENTIC} />
             </div>
-          </SectionReveal>
+
+            <div className="mt-6 border border-line bg-panel p-6 md:p-8">
+              <h3 className="mono mb-6 text-[11px] uppercase tracking-[0.18em] text-running">
+                Chemical process and plant systems
+              </h3>
+              <DefList items={PLANT} />
+            </div>
+          </Reveal>
         </div>
       </section>
 
-      {/* ── Education ── */}
-      <section id="education" className="border-t border-[#1e293b] px-6 py-24">
+      {/* ── 03 Experience ── */}
+      <section id="experience" className="py-16 sm:py-20 md:py-24">
         <div className="mx-auto max-w-6xl">
-          <SectionHeader label="EDUCATION & CERTIFICATIONS" title="Training that bridges two worlds" />
-          <SectionReveal>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {[
-                { inst:"PIAIC", title:"Certified Agentic AI Architect", date:"Jun 2026", color:"#22d3ee" },
-                { inst:"SMIT", title:"Certified Agentic AI Engineer", date:"2026 Edition — In Progress", color:"#22d3ee" },
-                { inst:"Autocon", title:"Industrial Automation — PLC, HMI, SCADA", date:"4-month program", color:"#16a34a" },
-                { inst:"Aligarh Inst. of Tech", title:"DAE — Chemical Technology", date:"2024", color:"#94a3b8" },
-                { inst:"Aptech Pakistan", title:"ADSE — Software Engineering", date:"CPISM Certified", color:"#94a3b8" },
-                { inst:"Cisco Networking Academy", title:"CCNA — Intro to Networks", date:"2026", color:"#94a3b8" },
-              ].map(e => (
-                <div key={e.inst} className="glass rounded-xl border border-[#1e293b] p-5 transition-all duration-200 hover:border-[#334155] hover:-translate-y-px">
-                  <h3 className="font-semibold">{e.inst}</h3>
-                  <p className="text-sm font-medium" style={{ color: e.color }}>{e.title}</p>
-                  <p className="mt-1 text-xs text-[#64748b]">{e.date}</p>
-                </div>
-              ))}
+          <SectionHeader index="03" label="Experience" title="Where the work happens" />
+
+          <Reveal>
+            <div className="border-s border-line-strong ps-6">
+              <StatusMark tone="running">in service</StatusMark>
+              <h3 className="mt-3 text-lg font-semibold text-ink">Backend AI Engineering Intern</h3>
+              <p className="mono mt-1 text-xs tracking-[0.1em] text-signal">FlyRank AI · June 2026 to present</p>
+              <p className="body-text measure mt-4 text-ink-2">
+                Building production AI backends: FastAPI services, agent SDK integration and the
+                deployment patterns that keep agentic systems running outside a notebook.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {["FastAPI", "Neon DB", "Agent SDKs"].map((t) => (
+                  <Tag key={t}>{t}</Tag>
+                ))}
+              </div>
             </div>
-          </SectionReveal>
+          </Reveal>
         </div>
       </section>
 
-      {/* ── Tech Stack ── */}
-      <section id="tech" className="border-t border-[#1e293b] px-6 py-24">
+      {/* ── 04 Credentials ── */}
+      <section id="credentials" className="py-16 sm:py-20 md:py-24">
         <div className="mx-auto max-w-6xl">
-          <SectionHeader label="TECHNOLOGY STACK" title="SMIT Mandatory 2026 Stack" subtitle="Where each technology applies — current usage and planned deployments across Industry 4.0 projects" />
-          <SectionReveal>
-            <div className="mb-6 flex flex-wrap gap-3">
-              <Badge color="cyan">Agent Frameworks</Badge>
-              <Badge color="green">Protocols</Badge>
-              <Badge color="amber">Data & Infra</Badge>
-              <Badge color="purple">Observability</Badge>
-            </div>
-            <TechMatrix />
-          </SectionReveal>
+          <SectionHeader
+            index="04"
+            label="Credentials"
+            title="What I am studying, and what I finished"
+          />
+
+          <Reveal>
+            <h3 className="mono mb-2 text-[11px] uppercase tracking-[0.18em] text-ink-3">
+              In progress
+            </h3>
+            <Ledger>
+              <Row
+                title="AI Architect"
+                meta="PIAIC · 2026"
+                status={{ tone: "signal", label: "in progress" }}
+              />
+              <Row
+                title="Agentic AI Engineer"
+                meta="SMIT · 2026 edition"
+                status={{ tone: "signal", label: "still in progress" }}
+              />
+              <Row
+                title="DAE, Chemical Technology"
+                meta="Aligarh Institute of Technology"
+                status={{ tone: "signal", label: "in progress" }}
+              />
+              <Row
+                title="AI Agent Factory curriculum"
+                meta="86 chapters on agent development"
+                href="https://agentfactory.panaversity.org/"
+              />
+            </Ledger>
+
+            <h3 className="mono mb-2 mt-10 text-[11px] uppercase tracking-[0.18em] text-ink-3">
+              Paused
+            </h3>
+            <Ledger>
+              <Row
+                title="ADSE, Software Engineering"
+                meta="Aptech Pakistan"
+                status={{ tone: "signal", label: "paused" }}
+              />
+            </Ledger>
+
+            <h3 className="mono mb-2 mt-10 text-[11px] uppercase tracking-[0.18em] text-ink-3">
+              Completed
+            </h3>
+            <Ledger>
+              <Row title="CPISM" meta="Aptech Pakistan · certified" />
+              <Row title="CCNA, Introduction to Networks" meta="Cisco Networking Academy · 2026" />
+            </Ledger>
+          </Reveal>
         </div>
       </section>
 
-      {/* ── Current Projects ── */}
-      <section id="projects" className="border-t border-[#1e293b] px-6 py-24">
+      {/* ── 05 Stack ── */}
+      <section id="stack" className="py-16 sm:py-20 md:py-24">
         <div className="mx-auto max-w-6xl">
-          <SectionHeader label="CURRENT PROJECTS" title="AI agents working today" subtitle="Production and near-production systems bridging AI and industrial domains" />
-          <SectionRevealStagger>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <ProjectCard large badge={{ color:"purple", label:"SMIT Class-5" }} title="E-commerce Agent System" desc="Multi-agent e-commerce system with tool-calling agents, product search, order processing, and customer service orchestration." techs={["Claude Code","MCP","Agent SDKs","Python"]} href="https://github.com/aliaftabsheikh/SMIT-batch04-weekdays-agentic-ai/tree/class-5-ecommerce-agents-skills/class-5" />
-              <ProjectCard badge={{ color:"green", label:"Industrial AI" }} title="Process Monitoring Agent" desc="AI agent monitoring reactor cooling loops, pressure sensors, and temperature thresholds. Fault-detection dashboards + CLI tools for plant operators." techs={["Python","SCADA","FastAPI","Neon DB"]} />
-              <ProjectCard badge={{ color:"amber", label:"ML + Automation" }} title="Predictive Maintenance Pipeline" desc="ML models for predictive maintenance in chemical industries. Real-time analytics pipeline with Python, SQL, and sensor data for early fault prediction." techs={["Python","SQL","scikit-learn","ML"]} />
-              <ProjectCard badge={{ color:"cyan", label:"Desktop + CLI" }} title="Operator Tool Suite" desc="CLI and GUI tools for industrial environments — sensor threshold monitors, alarm dashboards, and data logging for plant floor operators." techs={["Python","PyQt","CLI","SQLite"]} />
-            </div>
-          </SectionRevealStagger>
+          <SectionHeader
+            index="05"
+            label="Stack"
+            title="What I build with"
+            lede="Grouped by layer rather than by vendor. Anything not yet running under a real system says planned."
+          />
+
+          <Reveal>
+            <StackMap />
+          </Reveal>
         </div>
       </section>
 
-      {/* ── GitHub Repositories ── */}
-      <section className="border-t border-[#1e293b] px-6 py-24">
+      {/* ── 06 Work ── */}
+      <section id="work" className="py-16 sm:py-20 md:py-24">
         <div className="mx-auto max-w-6xl">
-          <SectionHeader label="OPEN SOURCE" title="GitHub repositories" subtitle="Production code, experiments, and integration tooling — all public on GitHub" />
-          <SectionRevealStagger>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <ProjectCard
-                badge={{ color: "green", label: "Industrial Python" }}
-                title="sensor-threshold-monitor"
-                desc="Python-based sensor threshold monitoring system for industrial environments. Reads sensor data streams, alerts on threshold violations, and logs for predictive analysis."
-                techs={["Python", "Sensors", "Monitoring"]}
+          <SectionHeader
+            index="06"
+            label="Work"
+            title="Systems that run"
+            lede="Public and running. Each entry links to the source. Client and internal systems follow in the next section, where they cannot be linked."
+          />
+
+          <Reveal>
+            <article className="border border-line-strong bg-panel p-6 md:p-8">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <StatusMark tone="running">open source</StatusMark>
+                <span className="mono text-[11px] tracking-[0.14em] text-ink-3">
+                  Agentic SCADA · Python
+                </span>
+              </div>
+              <h3 className="mt-4 text-2xl font-semibold tracking-tight text-ink">AgriAgent</h3>
+              <p className="body-text measure mt-3 text-ink-2">
+                Biopesticides are safe but fragile: UV and heat destroy them within hours of
+                mixing. AgriAgent reads live UV, temperature and humidity telemetry, works out how
+                fast the active ingredient is degrading, and dispatches the corrected recipe over
+                MQTT to a dosing rig or its digital twin.
+              </p>
+              <ul className="body-text measure mt-5 space-y-2 text-ink-2">
+                <li className="border-t border-line pt-2">
+                  <span className="text-ink">Perception, formulation, safety, actuator</span> as four agent roles over MCP tool calls.
+                </li>
+                <li className="border-t border-line pt-2">
+                  <span className="text-ink">Dynamic stoichiometry</span>, recomputed from live conditions rather than chosen from a table.
+                </li>
+                <li className="border-t border-line pt-2">
+                  <span className="text-ink">An MQTT digital twin</span> of the mixing loop, with an optional ESP32 rig for peristaltic dosing.
+                </li>
+              </ul>
+              <div className="mt-5 flex flex-wrap gap-1.5">
+                {["Python", "MCP", "MQTT", "Digital twin", "ESP32"].map((t) => (
+                  <Tag key={t}>{t}</Tag>
+                ))}
+              </div>
+              <a
+                href="https://github.com/usman-shamim/AgriAgent"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mono press group mt-6 inline-flex min-h-11 items-center gap-2 text-xs uppercase tracking-[0.14em] text-signal hover:text-ink"
+              >
+                Read the source{" "}
+                <span
+                  aria-hidden="true"
+                  className="transition-transform duration-150 group-hover:translate-x-0.5"
+                >
+                  →
+                </span>
+              </a>
+            </article>
+
+            <h3 className="mono mb-2 mt-12 text-[11px] uppercase tracking-[0.18em] text-ink-3">
+              Also public
+            </h3>
+            <Ledger>
+              <Row
+                title="Saylani student ops desk"
+                meta="OpenAI Agents SDK · Python"
+                detail="A bootcamp front desk. One student asks in plain language; the Desk works out whether it is an assignment, career or admin question, answers from real course data, and closes every resolved conversation with a structured ticket a downstream system could file."
+                tags={["gpt-5-nano", "Handoffs", "Guardrails", "Chainlit"]}
+                href="https://github.com/usman-shamim/student-desk"
+              />
+              <Row
+                title="Shop Desk"
+                meta="OpenAI Agents SDK · Python"
+                detail="A storefront front desk. Answers price and stock questions from a catalogue file, assembles a typed order when the customer confirms, and refuses any price or SKU that is not in the catalogue."
+                tags={["Output guardrail", "Tool gating", "Typed orders"]}
+                href="https://github.com/usman-shamim/shop-desk"
+              />
+              <Row
+                title="Lead Desk"
+                meta="OpenAI Agents SDK · Python"
+                detail="Triages incoming freelance leads into a typed verdict. The model never sees the rate card, the decision to save a lead is made in Python rather than by the model, and a request to misrepresent experience is refused before an API call is spent."
+                tags={["Typed output", "Tool isolation", "Gemini"]}
+                href="https://github.com/usman-shamim/Lead-Desk"
+              />
+              <Row
+                title="Sensor threshold monitor"
+                meta="Python"
+                detail="Two cooperating tools for plant monitoring: a standard-library CLI that checks CSV sensor readings against configurable thresholds, and a desktop SCADA dashboard that watches a reactor cooling loop, raises alarms and classifies faults. Both share one threshold implementation."
+                tags={["SCADA", "Alarms", "Standard library only"]}
                 href="https://github.com/usman-shamim/sensor-threshold-monitor"
               />
-              <ProjectCard
-                badge={{ color: "purple", label: "AI Agent Integration" }}
+              <Row
+                title="One agent, two providers"
+                meta="OpenAI Agents SDK · Python"
+                detail="A single Agent definition that runs on either OpenAI or Gemini, switched by one line in .env. Written after a client needed Gemini for billing reasons without the agent code changing."
+                tags={["Config over code", "Gemini", "OpenAI"]}
+                href="https://github.com/usman-shamim/openai-agents-multi-provider"
+              />
+              <Row
+                title="ctxpack"
+                meta="Python · standard library"
+                detail="A context-engineering CLI. Given a project folder, a task and a token budget, it packs the most relevant files into one markdown bundle, with a manifest accounting for every file it kept or dropped."
+                tags={["Context engineering", "CLI"]}
+                href="https://github.com/usman-shamim/hackathon"
+              />
+              <Row
                 title="bagisto-automation"
-                desc="Bearer-token REST API + admin review queue + signed webhooks for Bagisto e-commerce. Built as an integration substrate for external AI agents to interact with store operations."
-                techs={["PHP", "REST API", "Webhooks", "AI Agents"]}
+                meta="PHP"
+                detail="A bearer-token REST API, an admin review queue and signed webhooks for Bagisto, built so an external agent can drive store operations without going through the admin UI."
+                tags={["REST API", "Webhooks", "AI agents"]}
                 href="https://github.com/usman-shamim/bagisto-automation"
               />
-              <ProjectCard
-                badge={{ color: "cyan", label: "AI Memory Systems" }}
-                title="sentinal-memory"
-                desc="Experiments and implementations around persistent AI memory systems — foundational work toward mem0 and LangMem integration for long-term agent memory in SMIT modules."
-                techs={["Python", "Memory", "AI Agents"]}
-                href="https://github.com/usman-shamim/sentinal-memory"
+            </Ledger>
+
+            <h3 className="mono mb-2 mt-12 text-[11px] uppercase tracking-[0.18em] text-ink-3">
+              In development
+            </h3>
+            <Ledger>
+              <Row
+                title="Field-service voice receptionist"
+                meta="Pipecat · in development"
+                detail="A voice agent that answers the calls a contractor cannot get to: books the call-out, captures the address and the fault, triages emergencies and hands the job to the office. Built for HVAC, plumbing and electrical businesses, where a missed call is a job that went to somebody else."
+                tags={["Pipecat", "Real-time voice", "Booking", "HVAC"]}
+              />
+              <Row
+                title="Inbound voice receptionist"
+                meta="Pipecat · in development"
+                detail="The general version, for any business that lives on the phone: answers, qualifies and routes, with a transcript and a summary waiting for the person who picks it up."
+                tags={["Pipecat", "Voice", "Qualification", "Handoff"]}
+              />
+            </Ledger>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ── 07 Private ── */}
+      <section id="private" className="py-16 sm:py-20 md:py-24">
+        <div className="mx-auto max-w-6xl">
+          <SectionHeader
+            index="07"
+            label="Private"
+            title="Client and internal systems"
+            lede="Working systems that cannot be linked. The depth is real, so they are described here; the code is not mine to publish."
+          />
+
+          <Reveal>
+            <Ledger>
+              <Row
+                title="SOPGuard"
+                meta="Private · lab and chemical compliance"
+                detail="A lab SOP compliance platform. Paste a procedure and get a structured report of which required sections are present or missing, with a citation to the governed SOP behind every flag. When the record does not cover a question, it says so instead of guessing."
+                tags={["Governed knowledge", "Cited retrieval", "Abstention"]}
+              />
+              <Row
+                title="Open agentic knowledge stack"
+                meta="Private · personal infrastructure"
+                detail="The system behind this work: a markdown vault as the storage layer, a governed knowledge record served over a stateless MCP endpoint, a self-improving agent as the client, and a Git-based sync service keeping it multi-device. Every layer is a separate repository behind a published contract."
+                tags={["MCP", "Knowledge governance", "FastAPI", "Git sync"]}
+              />
+              <Row
+                title="Lab toolkit conventions"
+                meta="Private · engineering standards"
+                detail="The house rules every module in this lab follows: MCP-first interfaces, one model-agnostic wrapper for every LLM call, stateless cores with state only at the edges, and configuration over hardcoding."
+                tags={["MCP-first", "Model-agnostic", "Config over hardcoding"]}
+              />
+              <Row
+                title="Bagisto store build"
+                meta="Private · commerce"
+                detail="A complete Bagisto commerce build across backend and frontend, with the specifications and state notes that go with it. The public bagisto-automation integration was written against this store."
+                tags={["PHP", "Bagisto", "Specs"]}
+              />
+            </Ledger>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ── 08 Contact ── */}
+      <section id="contact" className="py-16 sm:py-20 md:py-28">
+        <div className="mx-auto max-w-6xl">
+          <SectionHeader
+            index="08"
+            label="Contact"
+            title="Tell me the problem you keep paying for"
+            lede="Send the process, the constraint, or the call you keep missing. I will tell you plainly whether an agent is the right answer, and what it would take."
+          />
+
+          <Reveal>
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <ContactAction href={`mailto:${EMAIL}`} label="Email" icon={<EmailIcon />} />
+              <CopyEmail address={EMAIL} />
+              <ContactAction
+                href="https://www.linkedin.com/in/m-usman-shamim/"
+                label="LinkedIn"
+                icon={<LinkedInIcon />}
+                external
+              />
+              <ContactAction
+                href="https://github.com/usman-shamim"
+                label="GitHub"
+                icon={<GitHubIcon />}
+                external
               />
             </div>
-          </SectionRevealStagger>
+          </Reveal>
         </div>
       </section>
 
-      {/* ── Industry 4.0 Roadmap ── */}
-      <section className="border-t border-[#1e293b] px-6 py-24">
-        <div className="mx-auto max-w-6xl">
-          <SectionHeader label="INDUSTRY 4.0 ROADMAP" title="Agentic systems for the factory floor" subtitle="Coming-soon projects at the convergence of chemical engineering, industrial automation, and agentic AI — built on the SMIT 2026 mandatory stack" />
-          <SectionRevealStagger>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <ComingSoonCard badge={{ color:"green", label:"SAP + PLC Bridge" }} title="OPC UA Agent Gateway" desc="MCP server bridging SAP S/4HANA and Siemens S7-1200 PLCs. AI agent reads production orders from SAP, monitors PLC data via OPC UA, and triggers predictive maintenance workflows." module="Module 3 — MCP + A2A" />
-              <ComingSoonCard badge={{ color:"cyan", label:"Digital Twin" }} title="Chemical Reactor Digital Twin" desc="LangGraph agent running digital twin simulations of chemical reactors. Compares real-time SCADA data against simulated states, flags anomalies, and suggests corrective actions." module="Module 2 — LangGraph" />
-              <ComingSoonCard badge={{ color:"purple", label:"MES / SCADA" }} title="Production Optimization Agent" desc="Multi-agent system connecting MES with real-time SCADA. Supervisor agent orchestrates quality, throughput, and energy optimization sub-agents via A2A protocol." module="Module 3 — A2A Protocol" />
-              <ComingSoonCard badge={{ color:"amber", label:"IIoT Network" }} title="Edge-to-Cloud Sensor Pipeline" desc="n8n workflows ingesting MQTT sensor streams from factory floor. RAG pipeline indexes sensor data (Pinecone) for natural-language queries like 'show temperature anomalies last shift.'" module="Module 2 — n8n + RAG" />
-              <ComingSoonCard badge={{ color:"green", label:"Supply Chain" }} title="Multi-Agent Logistics Orchestrator" desc="Supply chain agents negotiating inventory, procurement, and shipping via A2A. OpenAI Agents SDK powers distributed decision-making across warehouse, transport, and supplier agents." module="Module 3 — OpenAI SDK + A2A" />
-              <ComingSoonCard badge={{ color:"cyan", label:"Quality + Vision" }} title="Vision AI Quality Inspector" desc="Computer vision agent for inline quality inspection on production lines. RAG over defect catalogs, LangSmith observability, deployed via Docker on edge hardware." module="Module 3 — RAG + LangSmith" />
-              <ComingSoonCard badge={{ color:"purple", label:"ERP / RPA" }} title="Autonomous ERP Agent" desc="n8n-powered RPA agent automating SAP workflows: purchase orders, invoice matching, inventory reconciliation. LLM-powered decision engine handles exceptions, escalates to human." module="Module 4 — n8n + LangSmith" />
-              <ComingSoonCard badge={{ color:"amber", label:"AI SOP Agent" }} title="Operator Guidance Assistant" desc="RAG agent built over plant SOPs, safety manuals, and incident logs. Operators query via natural language — 'what's the shutdown sequence for Reactor B?' — with cited sources." module="Module 2 — RAG + Pinecone" />
-              <ComingSoonCard badge={{ color:"cyan", label:"Full Platform" }} title="Industry 4.0 Agent Platform" desc="Capstone: Dockerized multi-agent platform unifying all modules. Dapr sidecars, A2A inter-agent communication, LangSmith observability, Neon DB persistence." module="Module 4 — Capstone" />
-            </div>
-          </SectionRevealStagger>
-        </div>
-      </section>
+      </main>
 
-      {/* ── Case Studies ── */}
-      <section id="case-studies" className="border-t border-[#1e293b] px-6 py-24">
-        <div className="mx-auto max-w-6xl">
-          <SectionHeader label="CASE STUDIES" title="Applied Industry 4.0 intelligence" subtitle="Real-world scenarios demonstrating how agentic AI transforms chemical manufacturing operations" />
-          <SectionRevealStagger>
-            <div className="grid gap-8 lg:grid-cols-2">
-              {[
-                {
-                  title:"Reactor Temperature Anomaly — Real-Time Agent Response",
-                  scenario:"A chemical batch reactor in Karachi's industrial corridor shows a 12°C deviation from setpoint. Traditional SCADA triggers an alarm; operator has 4 minutes to diagnose and respond.",
-                  solution:"The Process Monitoring Agent detects the anomaly via OPC UA sensor stream, cross-references against the digital twin simulation, identifies cooling water valve degradation as root cause, and suggests corrective action — all within 90 seconds.",
-                  techs:["PLC/SCADA","Digital Twin","LangGraph","OPC UA"], color:"#22d3ee",
-                },
-                {
-                  title:"Multi-Plant Supply Chain Disruption",
-                  scenario:"An upstream solvent supplier delays shipment, threatening production at 3 chemical plants. Manual coordination takes hours of phone calls and spreadsheet updates.",
-                  solution:"Supply Chain Agents across all 3 plants negotiate via A2A protocol. Procurement agent identifies alternate supplier, logistics agent re-routes inventory, production agent adjusts batch schedules — autonomous resolution in under 5 minutes.",
-                  techs:["A2A Protocol","OpenAI SDK","Multi-Agent","Neon DB"], color:"#16a34a",
-                },
-                {
-                  title:"Predictive Maintenance — From Reactive to Proactive",
-                  scenario:"A critical centrifugal pump fails unexpectedly, causing 8 hours of unplanned downtime. Post-mortem reveals vibration data showed degradation 3 weeks earlier.",
-                  solution:"Predictive Maintenance Pipeline ingests real-time vibration and temperature data, ML models detect early degradation signatures, MES Agent automatically schedules maintenance during planned downtime — preventing the failure entirely.",
-                  techs:["ML","FastAPI","SCADA","MES"], color:"#f59e0b",
-                },
-                {
-                  title:"Operator SOP Overload — AI-Powered Guidance",
-                  scenario:"A junior operator faces an unfamiliar alarm during night shift. 200+ page SOP manual sits in the control room. Finding the right procedure takes 8 minutes — every second counts.",
-                  solution:"SOP Agent receives alarm context, retrieves exact procedure via RAG over indexed documentation, presents step-by-step guidance with cited sources, and confirms each action via HMI — reducing response time to 45 seconds.",
-                  techs:["RAG","Pinecone","Claude Code","HMI"], color:"#a855f7",
-                },
-              ].map(cs => (
-                <div key={cs.title} className="group rounded-xl border border-[#1e293b] bg-[#0e1223] p-6 transition-all duration-200 hover:-translate-y-1 hover:border-[#334155]">
-                  <div className="mb-3 flex items-center gap-2">
-                    <span className="inline-block h-2 w-2 rounded-full" style={{ background: cs.color }} />
-                    <span className="font-mono text-[10px] uppercase tracking-wider text-[#64748b]">Case Study</span>
-                  </div>
-                  <h3 className="mb-3 text-lg font-semibold text-[#f8fafc]">{cs.title}</h3>
-                  <div className="mb-3 space-y-2 text-sm text-[#94a3b8]">
-                    <p><span className="font-semibold text-[#64748b]">Scenario:</span> {cs.scenario}</p>
-                    <p><span className="font-semibold text-[#64748b]">Solution:</span> {cs.solution}</p>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">{cs.techs.map(t=><TechTag key={t} name={t} />)}</div>
-                </div>
-              ))}
-            </div>
-          </SectionRevealStagger>
-        </div>
-      </section>
-
-      {/* ── Contact ── */}
-      <section id="contact" className="border-t border-[#1e293b] px-6 py-24">
-        <div className="mx-auto max-w-6xl">
-          <SectionHeader label="CONTACT" title="Let's build the future of industrial intelligence" />
-          <SectionReveal>
-            <div className="flex flex-wrap gap-4">
-              <ContactButton href="https://www.linkedin.com/in/m-usman-shamim/" target="_blank" rel="noopener noreferrer" label="LinkedIn" icon={LI} />
-              <ContactButton href="mailto:usman.shamim@example.com" label="Email" icon={EM} />
-              <ContactButton href="https://github.com/" target="_blank" rel="noopener noreferrer" label="GitHub" icon={GH} />
-            </div>
-          </SectionReveal>
-        </div>
-      </section>
-
-      {/* ── Footer ── */}
-      <footer className="border-t border-[#1e293b] px-6 py-10">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 text-xs text-[#64748b] sm:flex-row">
-          <span className="font-mono">M. Usman Shamim &copy; 2026</span>
-          <span>Industry 4.0 · Agentic AI · Chemical Technology · PIAIC · SMIT · Autocon</span>
+      <footer className="pad-safe-bottom border-t border-line py-10">
+        <div className="mx-auto flex max-w-6xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <span className="mono text-xs tracking-[0.14em] text-ink-3">
+            M. Usman Shamim © 2026
+          </span>
+          <span className="mono text-xs tracking-[0.14em] text-ink-3">
+            Agentic AI · Chemical technology · Automation
+          </span>
         </div>
       </footer>
     </div>
   );
 }
-
-const LI = <svg className="h-5 w-5" viewBox="0 0 24 24" fill="#22d3ee"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>;
-const EM = <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" strokeWidth="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>;
-const GH = <svg className="h-5 w-5" viewBox="0 0 24 24" fill="#22d3ee"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>;
