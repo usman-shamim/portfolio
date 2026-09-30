@@ -536,8 +536,9 @@ export function Navbar() {
 
   /* The panel had an entrance and no exit. Dismissing it plays a short,
      accelerating fade so the eye can see it belongs to the trigger, then it
-     actually closes. `animationend` still fires under reduced motion, because
-     the global reset uses 0.01ms rather than `none`. */
+     actually closes. The closing rule is authored outside the no-preference
+     query, so reduced motion shortens it to 0.01ms rather than removing it and
+     `animationend` still fires. */
   const closeMenuAnimated = () => {
     const menu = menuRef.current;
     const panel = menuPanelRef.current;

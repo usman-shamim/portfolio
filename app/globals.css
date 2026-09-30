@@ -146,6 +146,12 @@ body {
   line-height: 1.6;
 }
 
+/* The label/data face. One definition for the `label mono caps` role above;
+   every label, meta and data line opts in with the bare class name. */
+.mono {
+  font-family: var(--font-mono);
+}
+
 /* Balance the hook, prettify the detail: headings avoid a stranded last word,
    paragraphs avoid a lone word on the final line. Neither goes on long-form,
    where balancing wastes width and slows reading. */
@@ -265,12 +271,6 @@ summary {
     animation: drop-in 200ms cubic-bezier(0.2, 0, 0, 1);
   }
 
-  /* Closing, which previously had no motion at all. Softer than the entrance
-     and shorter, with an accelerating curve because it is leaving. */
-  details[open] > ul.is-closing {
-    animation: lift-out 140ms cubic-bezier(0.4, 0, 1, 1) forwards;
-  }
-
   /* Hero: six chunks in reading order, tight enough that the last lands inside
      a second. This is the only staged entrance on the page. */
   .hero-chunk {
@@ -288,6 +288,15 @@ summary {
   :focus-visible {
     transition: outline-offset 150ms cubic-bezier(0.2, 0, 0, 1);
   }
+}
+
+/* Closing, which previously had no motion at all. Softer than the entrance and
+   shorter, with an accelerating curve because it is leaving. Authored outside
+   the no-preference query on purpose: the reduced-motion reset below shortens
+   this animation to 0.01ms rather than removing it, so `animationend` still
+   fires and the panel closes immediately instead of waiting on the timeout. */
+details[open] > ul.is-closing {
+  animation: lift-out 140ms cubic-bezier(0.4, 0, 1, 1) forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
