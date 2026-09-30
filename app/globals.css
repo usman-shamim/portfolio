@@ -198,7 +198,7 @@ summary {
 
 /* Detail copy holds a readable measure. `ch` is the width of the "0" glyph, which
    in this face is about 0.66em, so a nominal 66ch measured 613px and ran to ~88
-   real characters. 34em at 14px is 476px, about 68 characters: inside the band,
+   real characters. 34em at 16px is 544px, about 68 characters: inside the band,
    and it scales with the font size. */
 .measure {
   max-width: 34em;

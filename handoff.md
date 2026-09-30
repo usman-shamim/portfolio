@@ -1,93 +1,49 @@
 # Portfolio Development Handoff
 
-## Session Summary
+## Current state
 
-Built a Next.js 16 + Tailwind CSS portfolio for **M. Usman Shamim** — a Forward Deployed Engineer who bridges chemical plant floors (PLC, SCADA, process control) and agentic AI (MCP, agent SDKs, multi-agent orchestration).
+A single-page Next.js 16 portfolio for **M. Usman Shamim**, a forward deployed
+engineer working across chemical process systems and agentic AI. It is positioned
+for two audiences at once: clients who need agents, automation or a web presence,
+and employers hiring for agentic AI work.
 
-## What Was Done
+`app/page.tsx` is the source of truth for what the page claims. Its sections are
+Services, Capabilities, Experience, Credentials, Stack, Work, Private and Contact;
+read it before editing copy. Two supporting documents are deliberately kept off
+the page:
 
-### Design System Applied (via ui-ux-pro-max skill)
+- `docs/backlog.md` — planned work, none of it built.
+- `docs/scenarios.md` — worked illustrations, explicitly not delivered engagements.
 
-The `ui-ux-pro-max-cli` was installed (`npm install -g ui-ux-pro-max-cli`) and `uipro init -a claude -f` was run in the project to install the full skill with `search.py` scripts and CSV data files.
+`app/globals.css` owns the design tokens and the motion system. The palette is an
+annunciator amber/graphite set, not the earlier cyan AI-tool look.
+`app/opengraph-image.tsx` generates the share card from the same palette.
 
-Key searches executed:
-- `search.py` design-system for "agentic ai engineer portfolio industrial automation dark mode"
-- `search.py` style domain: "industrial dark technical engineering cyber-physical" → Found OLED Dark, HUD/Sci-Fi FUI, Cyberpunk
-- `search.py` color domain: "engineering robotics automation manufacturing" → Found RPA Automation Dashboard palette
-- `search.py` typography: "developer engineer portfolio dark" → Found Developer Mono / Dark Cinema pairings
-- `search.py` landing domain: "portfolio hero grid project social-proof" → Found Portfolio Grid + Bento Grid patterns
-- `search.py` ux domain: "animation cursor hover z-index loading interaction" → Found z-index scale, hover rules, reduced-motion guidelines
+## Deliberate decisions — do not "correct" these
 
-Final design system applied:
-- **Palette**: `#020617` background, `#0e1223` cards, `#22d3ee` AI cyan, `#16a34a` industrial green, `#f59e0b` amber, `#a855f7` purple
-- **Style**: OLED Dark + HUD/FUI aesthetic with scanlines, glow orbs, signal-trace SVG, thin wireframe brackets, terminal typography
-- **Typography**: Geist Sans (Inter-family) per Dark Cinema recommendation
-- **Pattern**: Portfolio Grid (Hero → Projects bento grid → About → Contact)
+The `207d467` redesign made these choices on purpose:
 
-### Files Modified
+- No industrial-automation course was taken. PLC programming, HMI design and
+  instrumentation are not claimed skills; OPC UA and PLC appear only as planned
+  integration in the stack and backlog.
+- PIAIC AI Architect and SMIT Agentic AI Engineer are **in progress**, never
+  "certified". DAE Chemical Technology is in progress; Aptech ADSE is paused;
+  CPISM stays completed.
+- Archived or third-party work is excluded (sentinal-memory, odysseus, PSX,
+  autoclip, PRIMM-AI+, saleor).
+- Private repositories are described as projects, marked private, with no source
+  link.
+- Client work is framed as objective and target market, never as a delivered
+  engagement, because no client deployment can be verified.
+- The voice receptionist appears as a service and as two projects: field service
+  and HVAC, and general inbound for businesses that live on the phone.
 
-| File | Changes |
-|------|---------|
-| `app/globals.css` | RPA palette CSS variables, keyframe animations (typing-cursor, aurora-drift, fade-in-up, slide-in-left), scanline overlay, particle-grid, HUD brackets, reduced-motion handling, z-index scale |
-| `app/components.tsx` | (created) Client components: `HoverCard`, `HoverCardLink`, `ContactButton` with hover enter/leave effects, cursor-pointer enforcement |
-| `app/page.tsx` | Full portfolio: Hero with typing cursor + signal trace + status indicators, Skills (Agentic AI + Industrial Automation cards), Experience timeline, Education grid, Projects grid (SMIT e-commerce + 3 industrial projects), Contact buttons (LinkedIn/Email/GitHub), Footer |
-| `app/layout.tsx` | Metadata: title "M. Usman Shamim — Agentic AI Engineer", description targeting industrial + agentic AI |
+## Configuration
 
-### Portfolio Content
+`NEXT_PUBLIC_SITE_URL` sets the absolute base for metadata and the share card; it
+falls back to `http://localhost:3000`. Set it on the deploy target.
 
-**Identity**: Forward Deployed Engineer — bridges chemical plant floors and agentic intelligence. Backend AI Engineering Intern at FlyRank AI (June 2026 — Present).
+## Environment
 
-**Education/Certs**:
-- PIAIC — Certified Agentic AI Architect
-- SMIT — Certified Agentic AI Engineer (in progress, 2026 Edition)
-- Autocon — Industrial Automation (PLC, HMI, SCADA, 4-month hands-on)
-- Aligarh Institute of Technology — DAE Chemical Technology
-- Aptech — ADSE Computer Software Engineering
-- Cisco CCNA — Introduction to Networks
-
-**Projects shown**:
-1. SMIT Class-5 E-commerce Agent System (clickable link to GitHub)
-2. Process Monitoring Agent (industrial AI)
-3. Predictive Maintenance Pipeline (ML + Automation)
-4. Industrial Operator Tool Suite (CLI + GUI tools)
-
-### Deployment
-
-- Repo: https://github.com/usman-shamim/portfolio (public)
-- GitHub CLI authenticated via `gh auth login -c -h github.com -p https` (device flow)
-- Commit on `main` branch with all files
-- HTTP status verified live: 200
-
-### Design System Artifacts
-
-- `design-system/usman-shamim-portfolio/MASTER.md` — generated by ui-ux-pro-max `--design-system` search
-- `.claude/skills/ui-ux-pro-max/SKILL.md` — full 386-line skill with checklist
-- `.commandcode/plans/portfolio-enhancement-ui-ux-pro-max.md` — implementation plan
-
-## Constraints Followed
-
-- No emojis as icons (SVG only)
-- cursor-pointer on all interactive elements
-- 150-300ms transitions only
-- prefers-reduced-motion respected
-- z-index scale: 10 (content), 20 (nav), 30 (overlays), 40 (scanlines), 50 (top)
-- Server components where possible, client components only for interactivity
-- No new npm dependencies (pure CSS + IntersectionObserver)
-
-## Next Session Focus
-
-Continuing portfolio enhancement per user direction (args: "dont add client and money related things and push the handoff.md as well").
-
-## Suggested Skills
-
-- **/ui-ux-pro-max** — apply full design system search results for additional sections
-- **/grill-me** — grill the user about specific technical projects and metrics for portfolio depth
-- **/review** — code review of components.tsx for React Next.js 16 best practices
-- **design-an-interface** — generate alternate bento grid layouts or visual variations
-
-## Environment Notes
-
-- Working dir: `C:\Users\usman\Desktop\piaic\usman-shamim-developer`
-- Stack: Next.js 16.3.0 (Turbopack), Tailwind CSS, TypeScript
-- Build passes: `npm run build` — 0 errors
-- GitHub CLI available at `C:\Program Files\GitHub CLI\gh.exe`
+Next.js 16.3.0 (Turbopack), Tailwind CSS v4, TypeScript. `npm run lint` runs
+ESLint; `npx tsc --noEmit` type-checks.
