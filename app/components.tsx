@@ -639,7 +639,7 @@ export function Navbar() {
             </summary>
             <ul
               ref={menuPanelRef}
-              className="absolute end-0 mt-2 max-h-[70svh] w-52 overflow-y-auto border border-line bg-panel py-1"
+              className="absolute end-0 top-full mt-2 max-h-[70svh] w-52 overflow-y-auto border border-line bg-panel py-1"
             >
               {SECTIONS.map((s) => (
                 <li key={s}>
