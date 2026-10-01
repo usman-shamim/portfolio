@@ -19,8 +19,11 @@ export const NAME = "M. Usman Shamim";
 export const ROLE = "Forward deployed engineer";
 export const DISCIPLINES = "Chemical technology + agentic AI";
 
+/* The home hero's line, written for the client reading it rather than for a peer.
+   Both pains are real and both systems exist; the line ends on the proof stance
+   the whole site is built around. */
 export const CLAIM =
-  "I build AI systems for process plants and for service businesses. Operators get agents that watch reactor loops, answer procedure questions with the source attached and flag drift before it becomes an alarm. Contractors get an agent that answers the phone. My grounding is chemical technology, and everything here is a system I built and can show you.";
+  "For a service business, a missed call is a job that went to somebody else. For a plant, a drifting loop is an alarm that did not need to ring. I build working agents that catch both, and I can show you every one of them running.";
 
 /* The eight sections. `blurb` is the one line the index and the compact menu
    show; `lede` is the longer paragraph each route opens with. */
@@ -70,7 +73,7 @@ export const SECTIONS = [
     index: "06",
     label: "Work",
     title: "Work",
-    blurb: "Eight public repositories and two systems still in development.",
+    blurb: "Seven public repositories and two systems still in development.",
     lede: "Public and running. Each entry links to the source. Client and internal systems are on the next page, where they cannot be linked.",
   },
   {
@@ -120,6 +123,39 @@ export const CURRENT = [
     detail: "Agentic AI Engineer programme, 2026 edition.",
     status: "still in progress",
     tone: "signal" as const,
+  },
+];
+
+/* The home hero's proof object. Real systems only: each line names the system,
+   its honest state, and the outcome in the client's terms, so a visitor deciding
+   whether to read on meets the work before any explanation of it. */
+export const FIELD_REPORT = [
+  {
+    name: "AgriAgent",
+    state: "open source",
+    tone: "running" as const,
+    outcome:
+      "reads live UV, temperature and humidity, works out how fast the active ingredient is degrading and dispatches the corrected recipe to the dosing rig.",
+  },
+  {
+    name: "FlyRank AI",
+    state: "in service",
+    tone: "running" as const,
+    outcome: "production AI backends and agent integration, kept running outside the notebook.",
+  },
+  {
+    name: "Voice receptionist",
+    state: "in development",
+    tone: "signal" as const,
+    outcome:
+      "answers the calls a contractor cannot get to, books the job and hands the rest to the office.",
+  },
+  {
+    name: "SOPGuard",
+    state: "private",
+    tone: "running" as const,
+    outcome:
+      "a lab procedure goes in, a cited compliance report comes out. When the record does not cover the question, it says so.",
   },
 ];
 
@@ -313,14 +349,6 @@ export const WORK_LEAD = {
 };
 
 export const WORK_PUBLIC = [
-  {
-    title: "Saylani student ops desk",
-    meta: "OpenAI Agents SDK · Python",
-    detail:
-      "A bootcamp front desk. One student asks in plain language; the Desk works out whether it is an assignment, career or admin question, answers from real course data, and closes every resolved conversation with a structured ticket a downstream system could file.",
-    tags: ["gpt-5-nano", "Handoffs", "Guardrails", "Chainlit"],
-    href: "https://github.com/usman-shamim/student-desk",
-  },
   {
     title: "Shop Desk",
     meta: "OpenAI Agents SDK · Python",

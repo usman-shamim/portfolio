@@ -7,8 +7,8 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { CURRENT, DISCIPLINES, NAME, ROLE, SECTIONS } from "./content";
-import { CompactNav, RailNav, ThemeToggle } from "./components";
+import { CLAIM, CURRENT, DISCIPLINES, FIELD_REPORT, NAME, ROLE, SECTIONS } from "./content";
+import { CompactNav, PixelCta, RailNav, ThemeToggle } from "./components";
 
 function cls(...args: (string | false | undefined | null)[]) {
   return args.filter(Boolean).join(" ");
@@ -30,21 +30,26 @@ export function SkipLink() {
 }
 
 /* ── The rail ──
-   The page's composition. A fixed left column carrying the wordmark, every
-   section as a route, the current readout and the theme control. Content scrolls
-   past it. Its width and the content's offset both come from --rail-w, so the two
-   cannot drift apart.
+   The page's composition. A sticky left column carrying the wordmark, every
+   section as a route, the current readout and the theme control. It sits in the
+   same flex row as the content, so its width and the content's width come from
+   one place and cannot disagree.
 
    The middle section scrolls on its own, so a short window scrolls the nav rather
    than clipping the readout at the bottom. */
 
 export function SiteRail() {
   return (
-    <div className="rail-wide pad-safe-top fixed inset-y-0 start-0 z-30 flex-col border-e border-line bg-ground">
+    /* No background: the body paints the ground and the field grid, and the rail has to
+       let both through or the grid stops at the rail's edge and the composition looks
+       painted on rather than drawn. Nothing scrolls under this rail, so transparency
+       costs nothing here. The sticky bar below is the opposite case and keeps its own
+       ground. */
+    <div className="rail-wide pad-safe-top z-30 flex-col border-e border-line">
       <div className="gutter flex-none py-4">
         <Link
           href="/"
-          className="press mono inline-flex min-h-11 items-center text-[11px] tracking-[0.24em] text-ink hover:text-ink-2"
+          className="press mono inline-flex min-h-11 items-center text-[11px] tracking-[0.24em] text-accent hover:text-ink-2 active:translate-y-px"
         >
           USMAN.SHAMIM
         </Link>
@@ -86,7 +91,7 @@ export function TopBar() {
       <div className="gutter flex items-center justify-between gap-3 py-2.5">
         <Link
           href="/"
-          className="press mono inline-flex min-h-11 items-center text-[11px] tracking-[0.24em] text-ink hover:text-ink-2"
+          className="press mono inline-flex min-h-11 items-center text-[11px] tracking-[0.24em] text-accent hover:text-ink-2 active:translate-y-px"
         >
           USMAN.SHAMIM
         </Link>
@@ -130,40 +135,76 @@ export function PageHeader({
   );
 }
 
+/* ── Field report ──
+   The home hero's proof object. A compact readout of the real systems, each with
+   its honest state and the outcome in the client's terms, so a visitor deciding
+   whether to read on meets the work before any explanation of it. Rows, not
+   cards, in the same ledger vocabulary the rest of the console speaks. */
+export function FieldReport() {
+  return (
+    <section aria-labelledby="field-report" className="console-chunk bg-panel p-5 pixel-cut md:p-6">
+      <div className="flex items-baseline justify-between gap-3">
+        <h2 id="field-report" className="mono text-[11px] uppercase tracking-[0.12em] text-accent">
+          Field report
+        </h2>
+        <span className="mono text-[11px] uppercase tracking-[0.12em] text-ink-3">
+          {FIELD_REPORT.length} systems
+        </span>
+      </div>
+      <ul className="mt-5 space-y-5">
+        {FIELD_REPORT.map((s) => (
+          <li key={s.name}>
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+              <h3 className="text-base font-semibold text-ink">{s.name}</h3>
+              <StatusMark tone={s.tone}>{s.state}</StatusMark>
+            </div>
+            <p className="body-text mt-1.5 text-ink-2">{s.outcome}</p>
+          </li>
+        ))}
+      </ul>
+      <Link
+        href="/work"
+        className="press group mono mt-4 inline-flex min-h-11 items-center gap-2 text-[11px] uppercase tracking-[0.12em] text-ink-2 underline decoration-line-strong underline-offset-4 hover:text-ink hover:decoration-ink active:translate-y-px"
+      >
+        See all the work
+        <span
+          aria-hidden="true"
+          className="transition-transform duration-150 group-hover:translate-x-0.5"
+        >
+          →
+        </span>
+      </Link>
+    </section>
+  );
+}
+
 export function HomeHeader() {
   return (
-    <header className="gutter pb-10 pt-10 md:pb-12 md:pt-16">
-      <p className="console-chunk mono text-[11px] uppercase tracking-[0.14em] text-ink-3">
-        {ROLE}
-        <span className="px-2 text-line-strong" aria-hidden="true">/</span>
-        {DISCIPLINES}
-      </p>
+    <header className="gutter grid gap-10 pb-10 pt-10 md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] md:pb-12 md:pt-16">
+      <div>
+        <p className="console-chunk mono text-[11px] uppercase tracking-[0.14em] text-ink-3">
+          {ROLE}
+          <span className="px-2 text-line-strong" aria-hidden="true">/</span>
+          {DISCIPLINES}
+        </p>
 
-      <h1 className="console-chunk mt-4 text-3xl font-semibold leading-[1.1] tracking-tight text-ink md:text-4xl">
-        {NAME}
-      </h1>
+        <h1 className="console-chunk mt-4 text-3xl font-semibold leading-[1.1] tracking-tight text-accent md:text-4xl">
+          {NAME}
+        </h1>
 
-      <p className="console-chunk body-text measure mt-5 text-ink-2">
-        I build AI systems for process plants and for service businesses. Operators get agents that
-        watch reactor loops, answer procedure questions with the source attached and flag drift
-        before it becomes an alarm. Contractors get an agent that answers the phone. My grounding is
-        chemical technology, and everything here is a system I built and can show you.
-      </p>
+        <p className="console-chunk body-text measure mt-5 text-ink-2">{CLAIM}</p>
 
-      <div className="console-chunk mt-6 flex flex-col gap-2.5 sm:flex-row">
-        <Link
-          href="/work"
-          className="press inline-flex min-h-11 w-full items-center justify-center border border-ink bg-ink px-4 text-sm font-medium text-ground hover:border-ink-2 hover:bg-ink-2 active:translate-y-px sm:w-auto"
-        >
-          See the shipped work
-        </Link>
-        <Link
-          href="/services"
-          className="press inline-flex min-h-11 w-full items-center justify-center border border-line-strong px-4 text-sm text-ink-2 hover:border-ink-3 hover:text-ink active:translate-y-px sm:w-auto"
-        >
-          See what I take on
-        </Link>
+        <div className="console-chunk mt-6 flex flex-col gap-2.5 sm:flex-row">
+          <PixelCta href="/work" variant="primary">
+            See the shipped work
+          </PixelCta>
+          <PixelCta href="/services" variant="secondary">
+            See what I take on
+          </PixelCta>
+        </div>
       </div>
+
+      <FieldReport />
     </header>
   );
 }
@@ -181,16 +222,18 @@ export function SectionIndex() {
           {SECTIONS.length} sections
         </span>
       </div>
-      <ul>
+      <ul className="space-y-1">
         {SECTIONS.map((s) => (
           <li key={s.slug}>
             <Link
               href={`/${s.slug}`}
-              className="press group grid gap-x-8 gap-y-1 border-b border-line py-5 hover:bg-panel md:grid-cols-[7rem_minmax(0,1fr)_auto] md:items-baseline"
+              className="press group grid gap-x-8 gap-y-1 px-1 py-3.5 active:translate-y-px md:grid-cols-[7rem_minmax(0,1fr)_auto] md:items-baseline"
             >
               <span className="mono text-[11px] text-ink-3">{s.index}</span>
               <span>
-                <span className="block text-lg font-medium text-ink">{s.label}</span>
+                <span className="block text-lg font-semibold text-ink decoration-line-strong underline-offset-4 group-hover:text-ink-2 group-hover:underline">
+                  {s.label}
+                </span>
                 <span className="body-text measure mt-1 block text-ink-2">{s.blurb}</span>
               </span>
               <span
@@ -270,7 +313,7 @@ export function Keywords({ items }: { items: readonly string[] }) {
 
 export function Ledger({ children, className }: { children: ReactNode; className?: string }) {
   /* A real list, so a screen reader announces the set and how many are in it. */
-  return <ul className={cls("border-b border-line", className)}>{children}</ul>;
+  return <ul className={cls("space-y-6", className)}>{children}</ul>;
 }
 
 export function Row({
@@ -288,10 +331,49 @@ export function Row({
   status?: { tone: Tone; label: string };
   href?: string;
 }) {
+  /* Only a link that leaves the site opens a new tab, and only that kind gets the
+     new-tab hint. Deriving it from the href means a future internal Row cannot
+     silently start opening tabs or claiming to. */
+  const external = href ? /^https?:/i.test(href) : false;
+
+  const titleNode = href ? (
+    /* The link is the title, not the row. Wrapping the whole row put the title,
+       the metadata, the detail and the keyword list into one accessible name,
+       which ran past 80 characters and told a screen-reader user nothing until it
+       finished. The stretched ::after keeps the whole row clickable.
+
+       The underline is at rest, not hover-only. It was `hover:underline`, which meant
+       a ledger row carried no cue at all until a pointer arrived: on touch the title
+       read as bold static text, and the row's only other signal was the hover
+       background. Every other linked element on the site already shows what it is
+       before you touch it — buttons carry a border, the section index and the trail
+       carry an arrow, the footer and work links carry an underline — so this row was
+       the one place the affordance lived behind hover. It now matches the site's
+       existing underlined-link treatment exactly: `decoration-line-strong` at rest,
+       `decoration-ink` on hover.
+
+       `py-3` on the link is there for the measured target, not for the look. This
+       is an inline box, so vertical padding grows its border box to about 45px
+       without taking part in line-height: the row's layout and rhythm are
+       untouched. Without it the box measures 21px and a bounding-box audit reports
+       an undersized target, even though the ::after already makes the whole row
+       hit-testable. */
+    <a
+      href={href}
+      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      className="press py-3 underline decoration-line-strong underline-offset-4 after:absolute after:inset-0 hover:decoration-ink"
+    >
+      {title}
+      {external && <span className="sr-only"> (opens in a new tab)</span>}
+    </a>
+  ) : (
+    title
+  );
+
   const body = (
     <>
       <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
-        <h3 className="font-medium text-ink">{title}</h3>
+        <h3 className="text-lg font-semibold text-ink">{titleNode}</h3>
         {meta && <span className="mono shrink-0 text-[11px] text-ink-3">{meta}</span>}
       </div>
       {detail && <p className="body-text measure mt-1.5 text-ink-2">{detail}</p>}
@@ -305,35 +387,44 @@ export function Row({
   );
 
   return (
-    <li className="border-t border-line">
-      {href ? (
-        <a
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="press block px-1 py-3.5 hover:bg-panel"
-        >
-          {body}
-        </a>
-      ) : (
-        <div className="px-1 py-3.5">{body}</div>
-      )}
+    <li className={cls("relative", href && "group")}>
+      <div className={cls("px-1", href && "press group-active:translate-y-px")}>
+        {body}
+      </div>
     </li>
   );
 }
 
-/* ── Definition list ── */
+/* ── Numbered index ──
+   The form the Services page uses, applied to capabilities.
 
-export function DefList({ items }: { items: readonly { term: string; detail: string }[] }) {
+   It replaces a three-column grid of equal-weight cells. On a decide surface an
+   equal grid gives the visitor nothing to rank, and that same grid contradicted
+   the sibling page, which presents this kind of list as an index. A numbered `ol`
+   is the honest element: it announces itself as a list and how long it is, and the
+   index column makes every row asymmetric, so the rows cannot read as
+   interchangeable tiles. */
+
+export function NumberedIndex({
+  items,
+}: {
+  items: readonly { term: string; detail: string }[];
+}) {
   return (
-    <dl className="grid gap-x-8 gap-y-3.5 sm:grid-cols-2 lg:grid-cols-3">
-      {items.map((i) => (
-        <div key={i.term} className="border-t border-line pt-3">
-          <dt className="text-ink">{i.term}</dt>
-          <dd className="body-text measure mt-1 text-ink-2">{i.detail}</dd>
-        </div>
+    <ol className="space-y-6">
+      {items.map((item, i) => (
+        <li
+          key={item.term}
+          className="grid gap-x-8 gap-y-2 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]"
+        >
+          <div className="flex items-baseline gap-3">
+            <span className="mono text-[11px] text-ink-3">{String(i + 1).padStart(2, "0")}</span>
+            <h3 className="text-lg font-semibold text-ink">{item.term}</h3>
+          </div>
+          <p className="body-text measure text-ink-2">{item.detail}</p>
+        </li>
       ))}
-    </dl>
+    </ol>
   );
 }
 
@@ -347,11 +438,11 @@ export function StackMap({
   layers: readonly { layer: string; items: readonly { name: string; planned?: boolean }[] }[];
 }) {
   return (
-    <dl className="border-t border-line">
+    <dl className="space-y-6">
       {layers.map((l) => (
         <div
           key={l.layer}
-          className="grid gap-x-6 gap-y-1.5 border-b border-line py-3.5 sm:grid-cols-[7rem_1fr]"
+          className="grid gap-x-6 gap-y-1.5 sm:grid-cols-[7rem_1fr]"
         >
           <dt className="mono text-[11px] uppercase tracking-[0.12em] text-ink-3">{l.layer}</dt>
           <dd className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
@@ -393,6 +484,7 @@ export function ContactAction({
     >
       {icon}
       {label}
+      {external && <span className="sr-only"> (opens in a new tab)</span>}
     </a>
   );
 }
@@ -436,13 +528,13 @@ export function SectionTrail({ slug }: { slug: string }) {
     <nav aria-label="Section trail" className="band gutter py-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         {prev ? (
-          <Link href={`/${prev.slug}`} className="press group inline-flex min-h-11 items-center gap-3">
+          <Link href={`/${prev.slug}`} className="press group inline-flex min-h-11 items-center gap-3 active:translate-y-px">
             <span aria-hidden="true" className="mono text-[11px] text-ink-3">←</span>
             <span className="mono text-[11px] uppercase tracking-[0.12em] text-ink-3">{prev.index}</span>
             <span className="text-sm text-ink-2 group-hover:text-ink">{prev.label}</span>
           </Link>
         ) : (
-          <Link href="/" className="press group inline-flex min-h-11 items-center gap-3">
+          <Link href="/" className="press group inline-flex min-h-11 items-center gap-3 active:translate-y-px">
             <span aria-hidden="true" className="mono text-[11px] text-ink-3">←</span>
             <span className="text-sm text-ink-2 group-hover:text-ink">Home</span>
           </Link>
@@ -450,7 +542,7 @@ export function SectionTrail({ slug }: { slug: string }) {
         {next ? (
           <Link
             href={`/${next.slug}`}
-            className="press group inline-flex min-h-11 items-center gap-3 sm:justify-end"
+            className="press group inline-flex min-h-11 items-center gap-3 active:translate-y-px sm:justify-end"
           >
             <span className="mono text-[11px] uppercase tracking-[0.12em] text-ink-3">{next.index}</span>
             <span className="text-sm text-ink-2 group-hover:text-ink">{next.label}</span>
@@ -459,7 +551,7 @@ export function SectionTrail({ slug }: { slug: string }) {
         ) : (
           <Link
             href="/contact"
-            className="press group inline-flex min-h-11 items-center gap-3 sm:justify-end"
+            className="press group inline-flex min-h-11 items-center gap-3 active:translate-y-px sm:justify-end"
           >
             <span className="text-sm text-ink-2 group-hover:text-ink">Get in touch</span>
             <span aria-hidden="true" className="mono text-[11px] text-ink-3">→</span>

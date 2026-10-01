@@ -14,6 +14,7 @@ import {
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
+  type ReactNode,
 } from "react";
 import { SECTIONS, type Section } from "./content";
 
@@ -119,7 +120,7 @@ export function RailNav() {
                 href={`/${s.slug}`}
                 aria-current={active ? "page" : undefined}
                 className={cls(
-                  "press flex min-h-11 items-center gap-3 border-s-2 ps-2.5 pe-2 text-sm",
+                  "press flex min-h-11 items-center gap-3 border-s-2 ps-2.5 pe-2 text-sm active:translate-y-px",
                   active
                     ? "border-signal text-ink"
                     : "border-transparent text-ink-3 hover:border-line-strong hover:text-ink-2"
@@ -194,6 +195,38 @@ export function CompactNav() {
     closeAnimated();
   };
 
+  /* A disclosure opened on a phone otherwise hangs over the page until it is
+     dismissed from its own trigger. Tapping the page or scrolling it both read as
+     "I am done with this", so both dismiss it.
+
+     The captured listener runs before the tap reaches anything under it, so a tap
+     on a page link closes the panel and still follows the link. The scroll close is
+     immediate rather than animated: the page is already moving, and a 160ms fade
+     over moving content reads as jank.
+
+     The callbacks below close over the first render's function values. That is safe
+     because every one of them reads only refs. */
+  useEffect(() => {
+    const menu = menuRef.current;
+    if (!menu) return;
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (!menu.open) return;
+      if (event.target instanceof Node && menu.contains(event.target)) return;
+      closeAnimated();
+    };
+    const onScroll = () => {
+      if (menu.open) menu.removeAttribute("open");
+    };
+
+    document.addEventListener("pointerdown", onPointerDown, true);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown, true);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
   return (
     /* The disclosure is itself the landmark. If it sat outside a nav element the
        page would expose no navigation landmark at all below the breakpoint,
@@ -209,7 +242,7 @@ export function CompactNav() {
         </summary>
         <ul
           ref={menuPanelRef}
-          className="absolute end-0 top-full mt-1.5 max-h-[70svh] w-72 overflow-y-auto border border-line bg-panel py-1"
+          className="absolute end-0 top-full mt-1.5 max-h-[70svh] w-72 max-w-[calc(100vw-2.5rem)] overflow-y-auto border border-line bg-panel py-1"
         >
           {SECTIONS.map((s: Section) => {
             const active = isActive(pathname, s.slug);
@@ -220,7 +253,7 @@ export function CompactNav() {
                   onClick={closeIfOpen}
                   aria-current={active ? "page" : undefined}
                   className={cls(
-                    "press flex min-h-12 items-center gap-3 px-3 hover:bg-raise",
+                    "press flex min-h-12 items-center gap-3 px-3 hover:bg-raise active:translate-y-px",
                     active ? "text-ink" : "text-ink-2 hover:text-ink"
                   )}
                 >
@@ -238,7 +271,7 @@ export function CompactNav() {
 
 /* ── Services ──
    An index rather than a grid of equal cards. The number and name carry the
-   weight on the left, the terms sit on the right, rules do the separating. */
+   weight on the left, the terms sit on the right, spacing does the separating. */
 
 export function ServicesList({
   items,
@@ -265,15 +298,15 @@ export function ServicesList({
   }, []);
 
   return (
-    <ul ref={ref} className={cls("stagger border-t border-line", shown && "is-shown")}>
+    <ul ref={ref} className={cls("stagger space-y-6", shown && "is-shown")}>
       {items.map((s, i) => (
         <li
           key={s.name}
-          className="grid gap-x-8 gap-y-3 border-b border-line py-5 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]"
+          className="grid gap-x-8 gap-y-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]"
         >
           <div className="flex items-baseline gap-3">
             <span className="mono text-[11px] text-ink-3">{String(i + 1).padStart(2, "0")}</span>
-            <h3 className="text-lg font-medium text-ink">{s.name}</h3>
+            <h3 className="text-lg font-semibold text-ink">{s.name}</h3>
           </div>
           <div>
             <p className="body-text measure text-ink-2">{s.detail}</p>
@@ -367,5 +400,394 @@ export function CopyEmail({ address }: { address: string }) {
         <span className="mono self-center break-all text-[11px] text-ink-3">{address}</span>
       )}
     </>
+  );
+}
+
+/* ── The field ──
+
+   The background this replaces was a grid of straight lines: it marked the rail's
+   module, but it also made the whole page feel boxed and ruled. This is the opposite
+   instrument — a soft, curved glow drawn in visible square cells.
+
+   The technique is ordered dithering. A smooth radial falloff is quantised against an
+   8x8 Bayer matrix, which turns one continuous shape into a field of discrete cells
+   whose density carries the shape. That is the site's own discipline made visible in
+   the background: the same low-contrast restraint as the rules, but round instead of
+   straight, and it drifts by one cell every couple of seconds so the page breathes
+   without any element moving.
+
+   The palette is hardcoded from painted-pixel measurements of the live tokens, not
+   read from the CSS variables, because a canvas needs an RGB string and the engine
+   reports the OKLCH tokens back as lab(). The brightest tone is capped well under the
+   ink, so any text that lands over the field keeps the contrast it is measured
+   against elsewhere.
+
+   It is one canvas, painted at cell resolution and upscaled with
+   `image-rendering: pixelated`, so the cells are crisp squares rather than a blur.
+   Nothing here animates per frame: a single interval moves the blob a few cells at a
+   time, which is what makes the drift read as 8-bit rather than as a video. Under
+   `prefers-reduced-motion` the interval never starts and the field holds still. Under
+   `prefers-contrast: more` it is removed entirely, because texture can only work
+   against legibility there. */
+
+const FIELD_CELL = 8;
+
+/*
+  Measured from the painted surfaces, not copied from the token file, so they are
+  what the browser actually produced. Dark ground is rgb(21,18,15) and the light
+  ground is rgb(249,246,243); the four tones step upward from each, and the top tone
+  stays far enough from the ink that text keeps its measured contrast on top of the
+  field.
+*/
+const FIELD_PALETTES = {
+  dark: {
+    ground: "#15120f",
+    tones: ["#1a1611", "#221d17", "#2d261d", "#3b3126"],
+  },
+  light: {
+    ground: "#f9f6f3",
+    tones: ["#f2efea", "#e9e4dc", "#dcd5cb", "#c9c0b3"],
+  },
+};
+
+/* The canonical 8x8 Bayer matrix. Each cell's threshold decides whether it lifts to
+   the next tone at that brightness, which is what turns a gradient into ordered
+   pixels instead of banding. */
+const BAYER8 = [
+   0, 32,  8, 40,  2, 34, 10, 42,
+  48, 16, 56, 24, 50, 18, 58, 26,
+  12, 44,  4, 36, 14, 46,  6, 38,
+  60, 28, 52, 20, 62, 30, 54, 22,
+   3, 35, 11, 43,  1, 33,  9, 41,
+  51, 19, 59, 27, 49, 17, 57, 25,
+  15, 47,  7, 39, 13, 45,  5, 37,
+  63, 31, 55, 23, 61, 29, 53, 21,
+];
+
+const smoothstep = (v: number) => v * v * (3 - 2 * v);
+
+function paintField(canvas: HTMLCanvasElement, theme: "dark" | "light", phase: number) {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  const w = Math.max(1, Math.ceil(window.innerWidth / FIELD_CELL));
+  const h = Math.max(1, Math.ceil(window.innerHeight / FIELD_CELL));
+  if (canvas.width !== w) canvas.width = w;
+  if (canvas.height !== h) canvas.height = h;
+
+  const pal = FIELD_PALETTES[theme];
+  const tones = pal.tones;
+  const S = tones.length;
+
+  ctx.fillStyle = pal.ground;
+  ctx.fillRect(0, 0, w, h);
+
+  /* Two blobs rather than one, so the glow has a pull across the page instead of
+     sitting dead centre. The dominant one sits up and to the right of the hero; a
+     dimmer counterweight hangs low on the rail side. */
+  const t = phase * 0.55;
+  const blobs = [
+    { x: 0.74 + 0.030 * Math.cos(t), y: 0.24 + 0.024 * Math.sin(t * 1.3), r: 0.62, k: 1 },
+    { x: 0.12 + 0.020 * Math.cos(t * 0.7 + 2.1), y: 0.84 + 0.026 * Math.sin(t * 0.9 + 0.6), r: 0.4, k: 0.55 },
+  ];
+  const aspect = w / h;
+
+  for (let y = 0; y < h; y++) {
+    const ny = (y + 0.5) / h;
+    for (let x = 0; x < w; x++) {
+      const nx = (x + 0.5) / w;
+      let v = 0;
+      for (const b of blobs) {
+        const d = Math.hypot((nx - b.x) * aspect, ny - b.y);
+        const u = 1 - Math.min(1, d / b.r);
+        if (u > 0) v += smoothstep(u) * b.k;
+      }
+      if (v <= 0.004) continue;
+      if (v > 1) v = 1;
+      const th = (BAYER8[(y & 7) * 8 + (x & 7)] + 0.5) / 64;
+      const lit = Math.floor(v * S + th);
+      if (lit <= 0) continue;
+      ctx.fillStyle = tones[Math.min(lit - 1, S - 1)];
+      ctx.fillRect(x, y, 1, 1);
+    }
+  }
+}
+
+export function PixelField() {
+  const ref = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    const canvas = ref.current;
+    if (!canvas) return;
+
+    const theme = () => (document.documentElement.dataset.theme === "light" ? "light" : "dark");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    let phase = 0;
+    const draw = () => paintField(canvas, theme(), phase);
+    draw();
+
+    let timer: number | undefined;
+    const stop = () => {
+      if (timer !== undefined) {
+        window.clearInterval(timer);
+        timer = undefined;
+      }
+    };
+    const start = () => {
+      if (reduce.matches || timer !== undefined) return;
+      timer = window.setInterval(() => {
+        if (document.hidden) return;
+        phase += 1;
+        draw();
+      }, 2200);
+    };
+    start();
+
+    const onMotion = () => (reduce.matches ? stop() : start());
+    reduce.addEventListener("change", onMotion);
+
+    let resizeTimer: number | undefined;
+    const onResize = () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(draw, 200);
+    };
+    window.addEventListener("resize", onResize);
+
+    const observer = new MutationObserver(draw);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+    return () => {
+      stop();
+      reduce.removeEventListener("change", onMotion);
+      window.clearTimeout(resizeTimer);
+      window.removeEventListener("resize", onResize);
+      observer.disconnect();
+    };
+  }, []);
+
+  return <canvas ref={ref} className="pixel-field" aria-hidden="true" />;
+}
+
+/* ── Pixel CTA ──
+   The hero buttons, built on React Bits' PixelCard
+   (github.com/DavidHDev/react-bits). Kept is the mechanic: a canvas grid of
+   tiny pixels that dissolve in from the centre on hover or focus and twinkle
+   out on leave. Dropped is the card around it — the 25px radius, the fixed
+   size, the border and the radial-glow ::before are every one of them a thing
+   this site refuses. The speckle is a neutral tone from the palette, never the
+   brand accent and never a state colour, and the effect is gated on
+   prefers-reduced-motion: no-preference, so reduced motion keeps the plain
+   lightness step and nothing moves. */
+
+/* Canvas fillStyle needs an sRGB string, and the engine reports the OKLCH
+   tokens back as lab(). These are the resolved ground and ink values per theme,
+   the same reason the field hardcodes its tones. */
+const PIXEL_TONES: Record<string, { ground: string; ink: string }> = {
+  dark: { ground: "#15120f", ink: "#eae7e3" },
+  light: { ground: "#f9f6f3", ink: "#16130f" },
+};
+
+/* Vendored from React Bits PixelCard, unchanged apart from the sizes the button
+   needs. One speck of the dissolve. */
+class Pixel {
+  ctx: CanvasRenderingContext2D;
+  x: number;
+  y: number;
+  color: string;
+  speed: number;
+  size: number;
+  sizeStep: number;
+  minSize: number;
+  maxSizeInteger: number;
+  maxSize: number;
+  delay: number;
+  counter: number;
+  counterStep: number;
+  isIdle: boolean;
+  isReverse: boolean;
+  isShimmer: boolean;
+
+  constructor(
+    canvas: HTMLCanvasElement,
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    color: string,
+    speed: number,
+    delay: number
+  ) {
+    this.ctx = ctx;
+    this.x = x;
+    this.y = y;
+    this.color = color;
+    this.speed = this.rand(0.1, 0.9) * speed;
+    this.size = 0;
+    this.sizeStep = Math.random() * 0.4;
+    this.minSize = 0.5;
+    this.maxSizeInteger = 2;
+    this.maxSize = this.rand(this.minSize, this.maxSizeInteger);
+    this.delay = delay;
+    this.counter = 0;
+    this.counterStep = Math.random() * 4 + (canvas.width + canvas.height) * 0.01;
+    this.isIdle = false;
+    this.isReverse = false;
+    this.isShimmer = false;
+  }
+
+  rand(min: number, max: number) {
+    return Math.random() * (max - min) + min;
+  }
+
+  draw() {
+    const off = this.maxSizeInteger * 0.5 - this.size * 0.5;
+    this.ctx.fillStyle = this.color;
+    this.ctx.fillRect(this.x + off, this.y + off, this.size, this.size);
+  }
+
+  appear() {
+    this.isIdle = false;
+    if (this.counter <= this.delay) {
+      this.counter += this.counterStep;
+      return;
+    }
+    if (this.size >= this.maxSize) this.isShimmer = true;
+    if (this.isShimmer) this.shimmer();
+    else this.size += this.sizeStep;
+    this.draw();
+  }
+
+  disappear() {
+    this.isShimmer = false;
+    this.counter = 0;
+    if (this.size <= 0) {
+      this.isIdle = true;
+      return;
+    }
+    this.size -= 0.1;
+    this.draw();
+  }
+
+  shimmer() {
+    if (this.size >= this.maxSize) this.isReverse = true;
+    else if (this.size <= this.minSize) this.isReverse = false;
+    this.size += this.isReverse ? -this.speed : this.speed;
+  }
+}
+
+const CTA_CLASS: Record<"primary" | "secondary", string> = {
+  primary: "border-ink bg-ink text-ground hover:border-ink-2 hover:bg-ink-2",
+  secondary: "border-line-strong text-ink-2 hover:border-ink-3 hover:text-ink",
+};
+
+export function PixelCta({
+  href,
+  variant = "primary",
+  children,
+}: {
+  href: string;
+  variant?: "primary" | "secondary";
+  children: ReactNode;
+}) {
+  const ref = useRef<HTMLAnchorElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const pixelsRef = useRef<Pixel[]>([]);
+  const rafRef = useRef<number | null>(null);
+  const lastRef = useRef(0);
+  const reduceRef = useRef(false);
+
+  const init = () => {
+    const el = ref.current;
+    const canvas = canvasRef.current;
+    if (!el || !canvas) return;
+    const rect = el.getBoundingClientRect();
+    const w = Math.max(1, Math.floor(rect.width));
+    const h = Math.max(1, Math.floor(rect.height));
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const theme = document.documentElement.dataset.theme === "light" ? "light" : "dark";
+    const tone = PIXEL_TONES[theme];
+    const color = variant === "primary" ? tone.ground : tone.ink;
+    const pxs: Pixel[] = [];
+    for (let x = 0; x < w; x += 7) {
+      for (let y = 0; y < h; y += 7) {
+        const dx = x - w / 2;
+        const dy = y - h / 2;
+        const delay = Math.sqrt(dx * dx + dy * dy);
+        pxs.push(new Pixel(canvas, ctx, x, y, color, 0.035, delay));
+      }
+    }
+    pixelsRef.current = pxs;
+  };
+
+  const animate = (fn: "appear" | "disappear") => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    const step = () => {
+      rafRef.current = requestAnimationFrame(step);
+      const now = performance.now();
+      const passed = now - lastRef.current;
+      const interval = 1000 / 60;
+      if (passed < interval) return;
+      lastRef.current = now - (passed % interval);
+      const canvas = canvasRef.current;
+      const ctx = canvas?.getContext("2d");
+      if (!canvas || !ctx) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let allIdle = true;
+      for (const p of pixelsRef.current) {
+        p[fn]();
+        if (!p.isIdle) allIdle = false;
+      }
+      if (allIdle && rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+    rafRef.current = requestAnimationFrame(step);
+  };
+
+  const enter = () => {
+    if (reduceRef.current) return;
+    init();
+    animate("appear");
+  };
+  const leave = () => {
+    if (reduceRef.current) return;
+    animate("disappear");
+  };
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    reduceRef.current = mq.matches;
+    const onMotion = () => {
+      reduceRef.current = mq.matches;
+    };
+    mq.addEventListener("change", onMotion);
+    init();
+    const ro = new ResizeObserver(() => init());
+    if (ref.current) ro.observe(ref.current);
+    return () => {
+      mq.removeEventListener("change", onMotion);
+      ro.disconnect();
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [variant]);
+
+  return (
+    <Link
+      ref={ref}
+      href={href}
+      onMouseEnter={enter}
+      onMouseLeave={leave}
+      onFocus={enter}
+      onBlur={leave}
+      className={cls(
+        "press relative inline-flex min-h-11 w-full items-center justify-center overflow-hidden border px-4 text-sm font-medium active:translate-y-px sm:w-auto",
+        CTA_CLASS[variant]
+      )}
+    >
+      <canvas ref={canvasRef} aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full" />
+      <span className="relative">{children}</span>
+    </Link>
   );
 }

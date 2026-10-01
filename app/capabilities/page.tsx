@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DefList, Group, PageHeader, SectionTrail } from "../parts";
+import { Group, NumberedIndex, PageHeader, SectionTrail } from "../parts";
 import { AGENTIC, PLANT, section } from "../content";
 
 const meta = section("capabilities");
@@ -15,11 +15,11 @@ export default function CapabilitiesPage() {
       <PageHeader index={meta.index} label={meta.label} title={meta.title} lede={meta.lede} />
 
       <Group label="Agent engineering" meta="6 capabilities">
-        <DefList items={AGENTIC} />
+        <NumberedIndex items={AGENTIC} />
       </Group>
 
       <Group label="Chemical process and plant systems" meta="6 capabilities">
-        <DefList items={PLANT} />
+        <NumberedIndex items={PLANT} />
       </Group>
 
       <SectionTrail slug="capabilities" />

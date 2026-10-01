@@ -15,7 +15,7 @@ export default function WorkPage() {
       <PageHeader index={meta.index} label={meta.label} title={meta.title} lede={meta.lede} />
 
       <div className="gutter py-10 md:py-12">
-        <article className="border border-line-strong bg-panel p-5 md:p-6">
+        <article className="bg-panel p-5 md:p-6 pixel-cut">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <StatusMark tone="running">{WORK_LEAD.status}</StatusMark>
             <span className="mono text-[11px] tracking-[0.12em] text-ink-3">{WORK_LEAD.meta}</span>
@@ -27,9 +27,9 @@ export default function WorkPage() {
 
           <p className="body-text measure mt-3 text-ink-2">{WORK_LEAD.detail}</p>
 
-          <ul className="body-text measure mt-4 space-y-2 text-ink-2">
+          <ul className="body-text measure mt-4 space-y-3 text-ink-2">
             {WORK_LEAD.points.map((p) => (
-              <li key={p.strong} className="border-t border-line pt-2">
+              <li key={p.strong}>
                 <span className="text-ink">{p.strong}</span>
                 {p.rest}
               </li>
@@ -42,17 +42,18 @@ export default function WorkPage() {
             href={WORK_LEAD.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="mono press group mt-5 inline-flex min-h-11 items-center gap-2 text-[11px] uppercase tracking-[0.12em] text-ink-2 underline decoration-line-strong underline-offset-4 hover:text-ink hover:decoration-ink"
+            className="mono press group mt-5 inline-flex min-h-11 items-center gap-2 text-[11px] uppercase tracking-[0.12em] text-ink-2 underline decoration-line-strong underline-offset-4 hover:text-ink hover:decoration-ink active:translate-y-px"
           >
             Read the source{" "}
             <span aria-hidden="true" className="transition-transform duration-150 group-hover:translate-x-0.5">
               →
             </span>
+            <span className="sr-only"> (opens in a new tab)</span>
           </a>
         </article>
       </div>
 
-      <Group label="Also public" meta="7 repositories">
+      <Group label="Also public" meta={`${WORK_PUBLIC.length} repositories`}>
         <Ledger>
           {WORK_PUBLIC.map((w) => (
             <Row

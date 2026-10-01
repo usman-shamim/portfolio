@@ -18,24 +18,71 @@
   have chosen dark themselves.
 */
 
+/*
+  Colour system.
+
+  One warm family. Every neutral carries a whisper of the accent's hue (75 against
+  the accent's 80), so the surfaces belong to the same world as the one colour
+  that means something. The previous palette had its neutrals at hue 250 and its
+  accent at 80, 171 degrees apart, which made the accent look applied to the page
+  rather than native to it.
+
+  Roles, in the order the interface uses them:
+
+    ground / panel / raise    canvas, surface, raised surface
+    line / line-strong        hairline border, structural rule
+    ink / ink-2 / ink-3       text, muted text, label and metadata
+    signal                    attention: current location, focus, in-progress
+    running                   success: in service
+    alert                     error: fault and failure
+    selection                 text selection wash
+
+  Built in OKLCH so equal lightness steps look equal. Every pairing is measured
+  rather than eyeballed: each text role clears 4.5:1 against BOTH ground and panel,
+  in BOTH themes.
+
+  The three state colours are separated by lightness, not only hue, because green
+  and red converge under deuteranopia and protanopia. Signal, running and alert sit
+  at L 0.86 / 0.74 / 0.66 in dark and 0.52 / 0.45 / 0.37 in light: a 0.20 and 0.15
+  spread, in the same order in both themes so the colours stay learnable. Colour
+  never carries a state alone; every StatusMark also carries a written label.
+
+  The two theme blocks below declare the same role names. Changing a role means
+  changing it in the dark block and both light blocks.
+*/
+
 :root {
-  /* The rail's width, and therefore the content's offset. One value, two uses. */
+  /* The rail's width, and with --content-w the width of the whole panel. */
   --rail-w: 15rem;
+  /* The widest the content column is ever allowed to get. Sized so the cap only
+     starts to bite above 1456px: on every ordinary laptop and desktop the panel
+     is simply the viewport, which is where the layout already reads correctly.
+     Past that the rules, band heads and row metadata drift apart, and the panel
+     composes itself instead. */
+  --content-w: 76rem;
 
-  --ground: #0d1013;
-  --panel: #14181d;
-  --raise: #1b2026;
-  --line: #252b32;
-  --line-strong: #39414a;
+  --ground: oklch(0.185 0.008 75);
+  --panel: oklch(0.225 0.010 75);
+  --raise: oklch(0.265 0.011 75);
+  --line: oklch(0.310 0.012 75);
+  --line-strong: oklch(0.400 0.014 75);
 
-  --ink: #e6e9ec;
-  --ink-2: #aab3bd;
-  --ink-3: #7d8791;
+  --ink: oklch(0.930 0.006 80);
+  --ink-2: oklch(0.765 0.014 80);
+  --ink-3: oklch(0.625 0.016 80);
+
+  /* The brand accent. One hue with a real job: the name, the wordmark and the
+     field-report header. A warm amber, the colour of a lit instrument lamp, so it
+     stays honest to the panel metaphor the field already draws. It is not a state
+     colour; running, signal and alert below keep their exclusive jobs. */
+  --accent: oklch(0.820 0.140 66);
 
   /* State only. Never used to decorate or to signal interaction. */
-  --signal: #d9a441;
-  --running: #3fb950;
-  --alert: #e5533d;
+  --signal: oklch(0.860 0.130 80);
+  --running: oklch(0.740 0.155 148);
+  --alert: oklch(0.655 0.190 30);
+
+  --selection: oklch(0.860 0.130 80 / 0.26);
 
   color-scheme: dark;
 }
@@ -44,19 +91,27 @@
    explicit choice. */
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
-    --ground: #f6f7f8;
-    --panel: #eef0f2;
-    --raise: #e4e7ea;
-    --line: #dde1e5;
-    --line-strong: #b3bac0;
+    --ground: oklch(0.975 0.005 75);
+    --panel: oklch(0.950 0.007 75);
+    --raise: oklch(0.920 0.008 75);
+    --line: oklch(0.890 0.009 75);
+    --line-strong: oklch(0.780 0.012 75);
 
-    --ink: #111417;
-    --ink-2: #414850;
-    --ink-3: #5f6873;
+    --ink: oklch(0.190 0.010 75);
+    --ink-2: oklch(0.400 0.016 75);
+    --ink-3: oklch(0.515 0.018 75);
 
-    --signal: #8a5a00;
-    --running: #0f6b32;
-    --alert: #b3230f;
+    /* The brand accent, deeper than the dark theme's so it keeps its weight on a
+       near-white ground. Same hue family, same single job. */
+    --accent: oklch(0.470 0.120 55);
+
+    /* Chroma is held at what sRGB can actually carry at this lightness, with L
+       and H unchanged. Asking for more would clip, not saturate. */
+    --signal: oklch(0.520 0.108 72);
+    --running: oklch(0.450 0.120 150);
+    --alert: oklch(0.370 0.144 30);
+
+    --selection: oklch(0.520 0.108 72 / 0.22);
 
     color-scheme: light;
   }
@@ -64,39 +119,89 @@
 
 /* The explicit choices, which win over the system. */
 [data-theme="light"] {
-  --ground: #f6f7f8;
-  --panel: #eef0f2;
-  --raise: #e4e7ea;
-  --line: #dde1e5;
-  --line-strong: #b3bac0;
+  --ground: oklch(0.975 0.005 75);
+  --panel: oklch(0.950 0.007 75);
+  --raise: oklch(0.920 0.008 75);
+  --line: oklch(0.890 0.009 75);
+  --line-strong: oklch(0.780 0.012 75);
 
-  --ink: #111417;
-  --ink-2: #414850;
-  --ink-3: #5f6873;
+  --ink: oklch(0.190 0.010 75);
+  --ink-2: oklch(0.400 0.016 75);
+  --ink-3: oklch(0.515 0.018 75);
 
-  --signal: #8a5a00;
-  --running: #0f6b32;
-  --alert: #b3230f;
+  /* The brand accent, deeper than the dark theme's so it keeps its weight on a
+     near-white ground. Same hue family, same single job. */
+  --accent: oklch(0.470 0.120 55);
+
+  --signal: oklch(0.520 0.108 72);
+  --running: oklch(0.450 0.120 150);
+  --alert: oklch(0.370 0.144 30);
+
+  --selection: oklch(0.520 0.108 72 / 0.22);
 
   color-scheme: light;
 }
 
 [data-theme="dark"] {
-  --ground: #0d1013;
-  --panel: #14181d;
-  --raise: #1b2026;
-  --line: #252b32;
-  --line-strong: #39414a;
+  --ground: oklch(0.185 0.008 75);
+  --panel: oklch(0.225 0.010 75);
+  --raise: oklch(0.265 0.011 75);
+  --line: oklch(0.310 0.012 75);
+  --line-strong: oklch(0.400 0.014 75);
 
-  --ink: #e6e9ec;
-  --ink-2: #aab3bd;
-  --ink-3: #7d8791;
+  --ink: oklch(0.930 0.006 80);
+  --ink-2: oklch(0.765 0.014 80);
+  --ink-3: oklch(0.625 0.016 80);
 
-  --signal: #d9a441;
-  --running: #3fb950;
-  --alert: #e5533d;
+  /* The brand accent; same value and job as the default block above. */
+  --accent: oklch(0.820 0.140 66);
+
+  --signal: oklch(0.860 0.130 80);
+  --running: oklch(0.740 0.155 148);
+  --alert: oklch(0.655 0.190 30);
+
+  --selection: oklch(0.860 0.130 80 / 0.26);
 
   color-scheme: dark;
+}
+
+/*
+  High contrast.
+
+  This site is border-led, so a request for stronger boundaries lands on the
+  hairlines and rules. At normal contrast they are decorative separators and are set
+  deliberately low; here they have to carry real weight. The text roles are left
+  alone: every one already clears AA on both surfaces, and the system holds no
+  transparency for this to compensate for.
+
+  The two themes need opposite values, because "stronger" means lighter against a
+  near-black ground and darker against a near-white one. The three blocks cover the
+  dark default, the explicit light choice, and the system-light case where no choice
+  is stored, and they are authored last so they win on source order at equal
+  specificity.
+*/
+@media (prefers-contrast: more) {
+  /* Texture works against legibility, so it goes. */
+  .pixel-field {
+    display: none;
+  }
+
+  :root {
+    --line: oklch(0.440 0.012 75);
+    --line-strong: oklch(0.600 0.014 75);
+  }
+
+  :root[data-theme="light"] {
+    --line: oklch(0.720 0.009 75);
+    --line-strong: oklch(0.460 0.012 75);
+  }
+}
+
+@media (prefers-contrast: more) and (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --line: oklch(0.720 0.009 75);
+    --line-strong: oklch(0.460 0.012 75);
+  }
 }
 
 @theme inline {
@@ -110,12 +215,24 @@
   --color-ink-2: var(--ink-2);
   --color-ink-3: var(--ink-3);
 
+  --color-accent: var(--accent);
+
   --color-signal: var(--signal);
   --color-running: var(--running);
   --color-alert: var(--alert);
+  --color-selection: var(--selection);
 
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-sans-stack);
+  --font-mono: var(--font-mono-stack);
+
+  /* `text-lg` and `text-xl` are used for headings and nothing else on this site, so
+     their leading is set once here rather than repeated on every element. Tailwind
+     ships body leading with those sizes — 1.56 at lg and 1.4 at xl — which reads
+     slack on a heading and makes a ledger row taller than its content needs. Both
+     are pulled toward the 1.1 the h1 already uses. Body copy is untouched: it keeps
+     1.6 from `.body-text`. */
+  --text-lg--line-height: 1.2;
+  --text-xl--line-height: 1.15;
 }
 
 html {
@@ -142,6 +259,19 @@ html {
   }
 }
 
+/*
+  The lane. Every block's own rule, background and border spans the full surface, so
+  the page stays attached to both edges; the content inside the block holds a lane so
+  a label and its own metadata never drift metres apart on a wide screen.
+
+  This is the containment the old centred panel used to give, moved inward. It only
+  bites above roughly 1488px — below that the column is already narrower than the
+  lane and nothing changes.
+*/
+.gutter > * {
+  max-width: var(--content-w);
+}
+
 .pad-safe-top {
   padding-top: env(safe-area-inset-top, 0px);
 }
@@ -153,13 +283,13 @@ html {
 body {
   background: var(--ground);
   color: var(--ink);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-sans-stack), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--signal) 26%, transparent);
+  background: var(--selection);
   color: var(--ink);
 }
 
@@ -170,19 +300,60 @@ body {
 }
 
 /*
-  The page's composition: a fixed left rail carrying the wordmark, every section
-  as a route, the current readout and the theme control. Content scrolls past it.
-
-  The rail's width and the content's offset both read from --rail-w, so they
-  cannot drift apart and the content can never end up underneath the rail. Both
-  scale with the root font size, which is the point: a reader who enlarges their
-  default text gets a wider rail and a matching wider inset, not a collision.
-
-  No fixed-width sidebar: there is no px constant anywhere in this layout.
+  The field. The curved, dithered glow that replaced the ruled grid. The shape lives
+  on a canvas in `components.tsx`; this class only has to hold it in place. Fixed so
+  it never scrolls, `z-index: -1` so it sits above the body's ground and below all
+  content, and `pointer-events: none` so it can never take a click. The canvas is
+  drawn at cell resolution, so `pixelated` keeps the squares crisp instead of soft.
+  Unlike the grid it is drawn at every width, because a glow is composition, not a
+  module: it means the same thing on a phone as on a monitor.
 */
+.pixel-field {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  image-rendering: pixelated;
+}
+
+/*
+  Composition: one instrument panel, attached to both viewport edges. A rail on the
+  left carries the wordmark, every section as a route, the current readout and the
+  theme control; the content column sits beside it.
+
+  The panel is deliberately NOT capped and NOT centred. A cap plus `margin-inline:
+  auto` made the whole surface float with margins once the viewport passed the cap,
+  which detached the rail from the left edge and stopped the rules short of the right
+  one — the surface read as a card sitting in the middle rather than as an instrument
+  bolted to the frame.
+
+  The containment those margins used to provide lives in `--content-w` instead, applied
+  to the content *inside* each block rather than to the surface. The rules, the
+  backgrounds and the rail therefore run the full width of the viewport, while the
+  text, the rows and the metadata hold a lane: see the `.gutter > *` rule below.
+
+  The rail is sticky inside a flex row rather than fixed with a matching padding
+  offset, so the offset arithmetic cannot exist and the two cannot disagree.
+*/
+.panel {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+}
+
+/* The content column. min-width: 0 is load-bearing: without it a flex child
+   refuses to shrink below its own content and the whole row overflows. */
+.column {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .rail-wide {
   display: none;
-  width: var(--rail-w);
 }
 
 .rail-narrow {
@@ -192,14 +363,19 @@ body {
 @media (min-width: 64rem) {
   .rail-wide {
     display: flex;
+    flex: none;
+    width: var(--rail-w);
+    /* Sticks for as long as the row is taller than the viewport, which is the
+       whole document. svh rather than vh so a mobile browser's expanded chrome
+       cannot push the readout off the bottom. */
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    height: 100svh;
   }
 
   .rail-narrow {
     display: none;
-  }
-
-  .rail-offset {
-    padding-inline-start: calc(var(--rail-w) + env(safe-area-inset-left, 0px));
   }
 }
 
@@ -233,9 +409,14 @@ body {
   line-height: 1.6;
 }
 
-/* The label/data face: labels, metadata, indices, status, table data. */
+/* The label/data face: labels, metadata, indices, status, table data.
+   Figures are tabular so the indices, counts and dates line up in a column
+   instead of wobbling as the digits change. Every numeral on the site is set in
+   this face, so this one declaration covers all of them; prose keeps the
+   proportional figures it should have. */
 .mono {
   font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
 
 h1,
@@ -253,6 +434,15 @@ a,
 button,
 summary {
   touch-action: manipulation;
+}
+
+/* Underline position and weight come from the font rather than from the browser's
+   synthetic defaults, so they sit correctly against Plex's own baselines instead of
+   floating at an arbitrary distance below them. The per-link `underline-offset`
+   still applies on top of this. */
+a {
+  text-underline-position: from-font;
+  text-decoration-thickness: from-font;
 }
 
 /* Detail copy holds a readable measure. `ch` is the width of the "0" glyph,
@@ -406,4 +596,34 @@ details[open] > ul.is-closing {
   .console-chunk {
     animation: settle 130ms linear forwards !important;
   }
+}
+
+/* A two-step pixel corner. The card used to carry a plain 1px border, which was the
+   most "box" thing on the page; the stepped cut is the pixel-art form of rounding and
+   it shapes the surface without an outline, because clip-path would erase a border.
+   `--p` is one pixel step, so the corner reads as two square notches at every size. */
+.pixel-cut {
+  --p: 4px;
+  clip-path: polygon(
+    calc(var(--p) * 2) 0,
+    calc(100% - var(--p) * 2) 0,
+    calc(100% - var(--p) * 2) var(--p),
+    calc(100% - var(--p)) var(--p),
+    calc(100% - var(--p)) calc(var(--p) * 2),
+    100% calc(var(--p) * 2),
+    100% calc(100% - var(--p) * 2),
+    calc(100% - var(--p)) calc(100% - var(--p) * 2),
+    calc(100% - var(--p)) calc(100% - var(--p)),
+    calc(100% - var(--p) * 2) calc(100% - var(--p)),
+    calc(100% - var(--p) * 2) 100%,
+    calc(var(--p) * 2) 100%,
+    calc(var(--p) * 2) calc(100% - var(--p)),
+    var(--p) calc(100% - var(--p)),
+    var(--p) calc(100% - var(--p) * 2),
+    0 calc(100% - var(--p) * 2),
+    0 calc(var(--p) * 2),
+    var(--p) calc(var(--p) * 2),
+    var(--p) var(--p),
+    calc(var(--p) * 2) var(--p)
+  );
 }
