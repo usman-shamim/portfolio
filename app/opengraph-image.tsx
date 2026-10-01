@@ -79,7 +79,7 @@ export default async function OpengraphImage() {
             color: "#8d877d",
           }}
         >
-          <span>AgriAgent · Shop Desk · Student ops desk</span>
+          <span>AgriAgent · Shop Desk</span>
           <span style={{ color: "#fec766" }}>github.com/usman-shamim</span>
         </div>
       </div>

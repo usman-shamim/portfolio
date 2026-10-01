@@ -26,7 +26,7 @@ function fetchFace(family: string, weight: number): Promise<ArrayBuffer> {
 
   const pending = (async () => {
     const css = await fetch(
-      `https://fonts.googleapis.com/css2?family=${family}&wght=${weight}`,
+      `https://fonts.googleapis.com/css2?family=${family}:wght@${weight}`,
       // No User-Agent on purpose: that is what selects the TTF response.
       { headers: { Accept: "text/css" } }
     ).then((r) => {

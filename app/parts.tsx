@@ -91,7 +91,7 @@ export function TopBar() {
       <div className="gutter flex items-center justify-between gap-3 py-2.5">
         <Link
           href="/"
-          className="press mono inline-flex min-h-11 items-center text-[11px] tracking-[0.24em] text-accent hover:text-ink-2 active:translate-y-px"
+          className="press mono inline-flex min-h-11 items-center text-[11px] min-[22rem]:tracking-[0.24em] text-accent hover:text-ink-2 active:translate-y-px"
         >
           USMAN.SHAMIM
         </Link>
