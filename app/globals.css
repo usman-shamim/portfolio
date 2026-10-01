@@ -1,40 +1,253 @@
 @import "tailwindcss";
 
 /*
-  Palette: drawn from annunciator-panel and control-sheet language, not from
-  the AI-tool default. Graphite surfaces, one signal amber for interaction,
-  green reserved for "in service", alert reserved for "not yet".
+  Dense operator console, in two themes.
+
+  Graphite ground, border-led structure, compact mono data. The palette is
+  deliberately restrained: every neutral is close to achromatic, one warm accent
+  names the brand, and the state colours are the only others on the page. Green
+  means running, amber means attention, red means fault — the annunciator
+  convention the plant HMI world uses, so the colours carry meaning rather than
+  mood. Interaction is expressed with lightness, never with hue.
+
+  Both themes use the same semantic token names, so every `bg-ground`,
+  `text-ink` and `border-line` in the app resolves correctly in either. Swapping
+  `data-theme` is the only thing that changes.
+
+  Default is dark. A visitor whose system asks for light gets light unless they
+  have chosen dark themselves.
 */
+
+/*
+  Colour system.
+
+  One warm family. Every neutral carries a whisper of the accent's hue (75 against
+  the accent's 80), so the surfaces belong to the same world as the one colour
+  that means something. The previous palette had its neutrals at hue 250 and its
+  accent at 80, 171 degrees apart, which made the accent look applied to the page
+  rather than native to it.
+
+  Roles, in the order the interface uses them:
+
+    ground / panel / raise    canvas, surface, raised surface
+    line / line-strong        hairline border, structural rule
+    ink / ink-2 / ink-3       text, muted text, label and metadata
+    accent                    brand: the name, the wordmark, the field-report header
+    signal                    attention: current location, focus, in-progress
+    running                   success: in service
+    alert                     error: fault and failure
+    selection                 text selection wash
+
+  Built in OKLCH so equal lightness steps look equal. Every pairing is measured
+  rather than eyeballed: each text role clears 4.5:1 against BOTH ground and panel,
+  in BOTH themes.
+
+  The three state colours are separated by lightness, not only hue, because green
+  and red converge under deuteranopia and protanopia. Signal, running and alert sit
+  at L 0.86 / 0.74 / 0.66 in dark and 0.52 / 0.45 / 0.37 in light: a 0.20 and 0.15
+  spread, in the same order in both themes so the colours stay learnable. Colour
+  never carries a state alone; every StatusMark also carries a written label.
+
+  Every theme block below declares the same role names: the dark default in
+  `:root` with its `data-theme="dark"` override, and the system-light and
+  `data-theme="light"` pair. Changing a role means changing it in all four.
+*/
+
+:root {
+  /* The rail's width, and with --content-w the width of the whole panel. */
+  --rail-w: 15rem;
+  /* The widest the content column is ever allowed to get. Sized so the cap only
+     starts to bite above 1456px: on every ordinary laptop and desktop the panel
+     is simply the viewport, which is where the layout already reads correctly.
+     Past that the rules, band heads and row metadata drift apart, and the panel
+     composes itself instead. */
+  --content-w: 76rem;
+
+  --ground: oklch(0.185 0.008 75);
+  --panel: oklch(0.225 0.010 75);
+  --raise: oklch(0.265 0.011 75);
+  --line: oklch(0.310 0.012 75);
+  --line-strong: oklch(0.400 0.014 75);
+
+  --ink: oklch(0.930 0.006 80);
+  --ink-2: oklch(0.765 0.014 80);
+  --ink-3: oklch(0.625 0.016 80);
+
+  /* The brand accent. One hue with a real job: the name, the wordmark and the
+     field-report header. A warm amber, the colour of a lit instrument lamp, so it
+     stays honest to the panel metaphor the field already draws. It is not a state
+     colour; running, signal and alert below keep their exclusive jobs. */
+  --accent: oklch(0.820 0.140 66);
+
+  /* State only. Never used to decorate or to signal interaction. */
+  --signal: oklch(0.860 0.130 80);
+  --running: oklch(0.740 0.155 148);
+  --alert: oklch(0.655 0.190 30);
+
+  --selection: oklch(0.860 0.130 80 / 0.26);
+
+  color-scheme: dark;
+}
+
+/* A light system preference wins over the dark default, but never over an
+   explicit choice. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --ground: oklch(0.975 0.005 75);
+    --panel: oklch(0.950 0.007 75);
+    --raise: oklch(0.920 0.008 75);
+    --line: oklch(0.890 0.009 75);
+    --line-strong: oklch(0.780 0.012 75);
+
+    --ink: oklch(0.190 0.010 75);
+    --ink-2: oklch(0.400 0.016 75);
+    --ink-3: oklch(0.515 0.018 75);
+
+    /* The brand accent, deeper than the dark theme's so it keeps its weight on a
+       near-white ground. Same hue family, same single job. */
+    --accent: oklch(0.470 0.120 55);
+
+    /* Chroma is held at what sRGB can actually carry at this lightness, with L
+       and H unchanged. Asking for more would clip, not saturate. */
+    --signal: oklch(0.520 0.108 72);
+    --running: oklch(0.450 0.120 150);
+    --alert: oklch(0.370 0.144 30);
+
+    --selection: oklch(0.520 0.108 72 / 0.22);
+
+    color-scheme: light;
+  }
+}
+
+/* The explicit choices, which win over the system. */
+[data-theme="light"] {
+  --ground: oklch(0.975 0.005 75);
+  --panel: oklch(0.950 0.007 75);
+  --raise: oklch(0.920 0.008 75);
+  --line: oklch(0.890 0.009 75);
+  --line-strong: oklch(0.780 0.012 75);
+
+  --ink: oklch(0.190 0.010 75);
+  --ink-2: oklch(0.400 0.016 75);
+  --ink-3: oklch(0.515 0.018 75);
+
+  /* The brand accent, deeper than the dark theme's so it keeps its weight on a
+     near-white ground. Same hue family, same single job. */
+  --accent: oklch(0.470 0.120 55);
+
+  --signal: oklch(0.520 0.108 72);
+  --running: oklch(0.450 0.120 150);
+  --alert: oklch(0.370 0.144 30);
+
+  --selection: oklch(0.520 0.108 72 / 0.22);
+
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --ground: oklch(0.185 0.008 75);
+  --panel: oklch(0.225 0.010 75);
+  --raise: oklch(0.265 0.011 75);
+  --line: oklch(0.310 0.012 75);
+  --line-strong: oklch(0.400 0.014 75);
+
+  --ink: oklch(0.930 0.006 80);
+  --ink-2: oklch(0.765 0.014 80);
+  --ink-3: oklch(0.625 0.016 80);
+
+  /* The brand accent; same value and job as the default block above. */
+  --accent: oklch(0.820 0.140 66);
+
+  --signal: oklch(0.860 0.130 80);
+  --running: oklch(0.740 0.155 148);
+  --alert: oklch(0.655 0.190 30);
+
+  --selection: oklch(0.860 0.130 80 / 0.26);
+
+  color-scheme: dark;
+}
+
+/*
+  High contrast.
+
+  This site is border-led, so a request for stronger boundaries lands on the
+  hairlines and rules. At normal contrast they are decorative separators and are set
+  deliberately low; here they have to carry real weight. The text roles are left
+  alone: every one already clears AA on both surfaces, and the system holds no
+  transparency for this to compensate for.
+
+  The two themes need opposite values, because "stronger" means lighter against a
+  near-black ground and darker against a near-white one. The three blocks cover the
+  dark default, the explicit light choice, and the system-light case where no choice
+  is stored, and they are authored last so they win on source order at equal
+  specificity.
+*/
+@media (prefers-contrast: more) {
+  /* Texture works against legibility, so it goes. */
+  .pixel-field {
+    display: none;
+  }
+
+  :root {
+    --line: oklch(0.440 0.012 75);
+    --line-strong: oklch(0.600 0.014 75);
+  }
+
+  :root[data-theme="light"] {
+    --line: oklch(0.720 0.009 75);
+    --line-strong: oklch(0.460 0.012 75);
+  }
+}
+
+@media (prefers-contrast: more) and (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --line: oklch(0.720 0.009 75);
+    --line-strong: oklch(0.460 0.012 75);
+  }
+}
+
 @theme inline {
-  --color-ground: #0b0e11;
-  --color-panel: #13171c;
-  --color-raise: #1a1f26;
-  --color-line: #262c34;
-  --color-line-strong: #39414b;
+  --color-ground: var(--ground);
+  --color-panel: var(--panel);
+  --color-raise: var(--raise);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
 
-  --color-ink: #e9ecef;
-  --color-ink-2: #bcc4cd;
-  --color-ink-3: #8f98a3;
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
 
-  --color-signal: #f2a93b;
-  --color-running: #3fb950;
-  --color-alert: #e5533d;
+  --color-accent: var(--accent);
 
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-signal: var(--signal);
+  --color-running: var(--running);
+  --color-alert: var(--alert);
+  --color-selection: var(--selection);
+
+  --font-sans: var(--font-sans-stack);
+  --font-mono: var(--font-mono-stack);
+
+  /* `text-lg` and `text-xl` are used for headings and nothing else on this site, so
+     their leading is set once here rather than repeated on every element. Tailwind
+     ships body leading with those sizes — 1.56 at lg and 1.4 at xl — which reads
+     slack on a heading and makes a ledger row taller than its content needs. Both
+     are pulled toward the 1.1 the h1 already uses. Body copy is untouched: it keeps
+     1.6 from `.body-text`. */
+  --text-lg--line-height: 1.2;
+  --text-xl--line-height: 1.15;
 }
 
 html {
   scroll-behavior: smooth;
-  /* Clears the fixed nav, including the notch inset it now honours. */
-  scroll-padding-top: calc(5.5rem + env(safe-area-inset-top, 0px));
+  /* Clears the sticky bar, including the notch inset it honours. */
+  scroll-padding-top: calc(4.5rem + env(safe-area-inset-top, 0px));
 }
 
 /*
-  One gutter definition for the whole page, safe-area aware.
-  viewport-fit=cover lets the surface reach the screen edges; this keeps the
-  content inside the notch and rounded-corner insets. Degrades to a plain
-  20px / 40px gutter wherever the insets are zero.
+  One gutter definition for the whole page, and the only source of horizontal
+  padding. Safe-area aware: viewport-fit=cover lets the surface reach the screen
+  edges, and this keeps the content inside the notch and rounded-corner insets.
+  Never combined with a px-* utility, which would double the inset.
 */
 .gutter {
   padding-inline-start: max(1.25rem, env(safe-area-inset-left, 0px));
@@ -43,9 +256,22 @@ html {
 
 @media (min-width: 48rem) {
   .gutter {
-    padding-inline-start: max(2.5rem, env(safe-area-inset-left, 0px));
-    padding-inline-end: max(2.5rem, env(safe-area-inset-right, 0px));
+    padding-inline-start: max(2rem, env(safe-area-inset-left, 0px));
+    padding-inline-end: max(2rem, env(safe-area-inset-right, 0px));
   }
+}
+
+/*
+  The lane. Every block's own rule, background and border spans the full surface, so
+  the page stays attached to both edges; the content inside the block holds a lane so
+  a label and its own metadata never drift metres apart on a wide screen.
+
+  This is the containment the old centred panel used to give, moved inward. It only
+  bites above roughly 1488px — below that the column is already narrower than the
+  lane and nothing changes.
+*/
+.gutter > * {
+  max-width: var(--content-w);
 }
 
 .pad-safe-top {
@@ -57,88 +283,127 @@ html {
 }
 
 body {
-  background: var(--color-ground);
-  color: var(--color-ink);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-sans-stack), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 ::selection {
-  background: rgba(242, 169, 59, 0.28);
-  color: var(--color-ink);
+  background: var(--selection);
+  color: var(--ink);
 }
 
-/* Focus is authored rather than inherited. Never removed, always visible. */
+/* Focus is a state, so it carries the state colour. Never removed. */
 :focus-visible {
-  outline: 2px solid var(--color-signal);
-  outline-offset: 3px;
-  border-radius: 2px;
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
 }
 
 /*
-  One static field replaces the three animated layers it replaced.
-  Engineering sheet: 8px minor rule, 40px major rule. No motion, no glow.
+  The field. The curved, dithered glow that replaced the ruled grid. The shape lives
+  on a canvas in `components.tsx`; this class only has to hold it in place. Fixed so
+  it never scrolls, `z-index: -1` so it sits above the body's ground and below all
+  content, and `pointer-events: none` so it can never take a click. The canvas is
+  drawn at cell resolution, so `pixelated` keeps the squares crisp instead of soft.
+  Unlike the grid it is drawn at every width, because a glow is composition, not a
+  module: it means the same thing on a phone as on a monitor.
 */
-.field {
-  background-image:
-    linear-gradient(to right, rgba(143, 152, 163, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(143, 152, 163, 0.03) 1px, transparent 1px),
-    linear-gradient(to right, rgba(143, 152, 163, 0.06) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(143, 152, 163, 0.06) 1px, transparent 1px);
-  background-size: 8px 8px, 8px 8px, 40px 40px, 40px 40px;
-  mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, #000 30%, transparent 100%);
-  -webkit-mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, #000 30%, transparent 100%);
+.pixel-field {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  image-rendering: pixelated;
 }
 
-/* ── Motion ──────────────────────────────────────────────────────────────
-   Motion is opt-in: the resting interface is the default, and the moving
-   version is layered on only when the user has not asked for less. Reduced
-   motion keeps the meaning and drops the travel.
-   ─────────────────────────────────────────────────────────────────────── */
+/*
+  Composition: one instrument panel, attached to both viewport edges. A rail on the
+  left carries the wordmark, every section as a route, the current readout and the
+  theme control; the content column sits beside it.
 
-@keyframes rise {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
+  The panel is deliberately NOT capped and NOT centred. A cap plus `margin-inline:
+  auto` made the whole surface float with margins once the viewport passed the cap,
+  which detached the rail from the left edge and stopped the rules short of the right
+  one — the surface read as a card sitting in the middle rather than as an instrument
+  bolted to the frame.
+
+  The containment those margins used to provide lives in `--content-w` instead, applied
+  to the content *inside* each block rather than to the surface. The rules, the
+  backgrounds and the rail therefore run the full width of the viewport, while the
+  text, the rows and the metadata hold a lane: see the `.gutter > *` rule below.
+
+  The rail is sticky inside a flex row rather than fixed with a matching padding
+  offset, so the offset arithmetic cannot exist and the two cannot disagree.
+*/
+.panel {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
 }
 
-/* The reduced alternative: the same arrival, without the displacement. */
-@keyframes settle {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+/* The content column. min-width: 0 is load-bearing: without it a flex child
+   refuses to shrink below its own content and the whole row overflows. */
+.column {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
-/* An overlay enters from the edge nearest its trigger. The menu trigger sits
-   at the top of the nav, so the panel drops in from above. */
-@keyframes drop-in {
-  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+.rail-wide {
+  display: none;
 }
 
-.reveal,
-.stagger > * { opacity: 0; }
+.rail-narrow {
+  display: block;
+}
 
-/* Interactive state changes name their properties, never `all`.
-   150ms is the responsiveness baseline: faster reads as twitchy. */
-.press {
-  transition-property: color, background-color, border-color, opacity, transform, scale, translate, box-shadow;
-  transition-duration: 150ms;
-  transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+@media (min-width: 64rem) {
+  .rail-wide {
+    display: flex;
+    flex: none;
+    width: var(--rail-w);
+    /* Sticks for as long as the row is taller than the viewport, which is the
+       whole document. svh rather than vh so a mobile browser's expanded chrome
+       cannot push the readout off the bottom. */
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    height: 100svh;
+  }
+
+  .rail-narrow {
+    display: none;
+  }
+}
+
+/*
+  A band is one block of the console: a strong rule, a labelled head row, then
+  the content. Bands stack without gaps so a page reads as one instrument.
+*/
+.band {
+  border-top: 1px solid var(--line-strong);
+}
+
+/* The head row sits on its own hairline so the label reads as a column header. */
+.band-head {
+  border-bottom: 1px solid var(--line);
 }
 
 /* ── Type ────────────────────────────────────────────────────────────────
-   One family in three weights, plus mono for labels and data.
+   Two families, no display face: a console is dense, not dramatic.
 
-   Roles, not a flat scale:
-     display   h1              30 / 48 / 72px, leading 1.08
-     section   h2              24 / 30px,      leading 1.25
-     entry     h3, lead titles 18 / 20 / 24px, leading 1.3
-     prose     body copy       16px,           leading 1.6
-     label     mono caps       10 / 11px,      tracking 0.14em
+     display   h1 (page title)  30 / 36px, leading 1.1
+     section   h2               20 / 24px, leading 1.2
+     entry     h3               18px, leading 1.3
+     prose     body copy        16px, leading 1.6
+     label     mono caps        11 / 12px, tracking 0.12em
 
-   Prose is 16px because this is read on phones as much as monitors, and 14px
-   sat under the body floor. Every leading is unitless so it follows the size
-   rather than staying behind as a fixed pixel value.
+   Density is carried by structure and mono, not by shrinking body copy.
    ──────────────────────────────────────────────────────────────────────── */
 
 .body-text {
@@ -146,15 +411,16 @@ body {
   line-height: 1.6;
 }
 
-/* The label/data face. One definition for the `label mono caps` role above;
-   every label, meta and data line opts in with the bare class name. */
+/* The label/data face: labels, metadata, indices, status, table data.
+   Figures are tabular so the indices, counts and dates line up in a column
+   instead of wobbling as the digits change. Every numeral on the site is set in
+   this face, so this one declaration covers all of them; prose keeps the
+   proportional figures it should have. */
 .mono {
   font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
 
-/* Balance the hook, prettify the detail: headings avoid a stranded last word,
-   paragraphs avoid a lone word on the final line. Neither goes on long-form,
-   where balancing wastes width and slows reading. */
 h1,
 h2,
 h3 {
@@ -166,47 +432,41 @@ dd {
   text-wrap: pretty;
 }
 
-/* A tap should act on first contact, not wait out the double-tap-zoom window. */
 a,
 button,
 summary {
   touch-action: manipulation;
 }
 
-/* ── Nav breakpoint ──────────────────────────────────────────────────────
-   Eight labels plus the wordmark measure about 810px. Between 640px and that
-   width the full list ran off the right edge with no way to scroll to it, so
-   the disclosure carries those widths instead. Written here rather than as an
-   arbitrary variant because this is a real threshold, not a utility tweak. */
-.nav-full {
-  display: none;
+/* Underline position and weight come from the font rather than from the browser's
+   synthetic defaults, so they sit correctly against Plex's own baselines instead of
+   floating at an arbitrary distance below them. The per-link `underline-offset`
+   still applies on top of this. */
+a {
+  text-underline-position: from-font;
+  text-decoration-thickness: from-font;
 }
 
-.nav-compact {
-  display: flex;
-}
-
-@media (min-width: 940px) {
-  .nav-full {
-    display: flex;
-  }
-
-  .nav-compact {
-    display: none;
-  }
-}
-
-/* Detail copy holds a readable measure. `ch` is the width of the "0" glyph, which
-   in this face is about 0.66em, so a nominal 66ch measured 613px and ran to ~88
-   real characters. 34em at 16px is 544px, about 68 characters: inside the band,
-   and it scales with the font size. */
+/* Detail copy holds a readable measure. `ch` is the width of the "0" glyph,
+   which in this face is about 0.66em; 34em at 16px is 544px, about 68
+   characters. Density elsewhere does not license an unreadable paragraph. */
 .measure {
   max-width: 34em;
 }
 
-/* Icon swap: cross-fade with scale and blur rather than toggling visibility,
-   so the change reads as one glyph becoming another. Both icons stay in the
-   DOM; the inactive one holds the hidden pose. */
+/* ── Controls ───────────────────────────────────────────────────────────── */
+
+/* Interactive state changes name their properties, never `all`. Lightness
+   carries interaction; hue belongs to the accent and the state colours. */
+.press {
+  transition-property: color, background-color, border-color, opacity, translate, box-shadow;
+  transition-duration: 140ms;
+  transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Icon swap: cross-fade with opacity and scale rather than toggling display.
+   Both glyphs stay mounted, so the accessible name never depends on which one
+   is painted. */
 .icon-swap {
   position: relative;
   display: inline-flex;
@@ -215,88 +475,113 @@ summary {
 }
 
 .icon-swap > * {
-  transition-property: opacity, scale, filter;
-  transition-duration: 200ms;
+  transition-property: opacity, scale;
+  transition-duration: 180ms;
   transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
 }
 
 .icon-swap > .is-off {
   opacity: 0;
-  scale: 0.25;
-  filter: blur(4px);
+  scale: 0.4;
 }
 
-/* ── Hero entrance ──
-   The one staged entrance on the page, and the only place a composed reveal is
-   earned: it runs once, above the fold, and the chunks arrive in reading order.
-   Blur is part of the recipe, bounded to a single 560ms pass. */
-@keyframes hero-in {
-  from { opacity: 0; transform: translateY(12px); filter: blur(6px); }
-  to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+/* The theme glyph pair. The one painted is the theme being offered, so it is the
+   opposite of the current one. CSS decides, which keeps the markup written by the
+   server identical to the markup the browser hydrates. */
+.theme-icon {
+  display: none;
 }
 
-/* Softer than the entrance and shorter: the panel is understood by then. */
+:root:not([data-theme="light"]) .theme-icon-sun {
+  display: inline-flex;
+}
+
+[data-theme="light"] .theme-icon-moon {
+  display: inline-flex;
+}
+
+/* Without JavaScript `data-theme` is never set, so the media query decides. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) .theme-icon-sun {
+    display: none;
+  }
+
+  :root:not([data-theme]) .theme-icon-moon {
+    display: inline-flex;
+  }
+}
+
+/* ── Motion ──────────────────────────────────────────────────────────────
+   A console responds; it does not perform. Everything is short and small.
+   ─────────────────────────────────────────────────────────────────────── */
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* The reduced alternative: the same arrival, without the displacement. */
+@keyframes settle {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* An overlay enters from the edge nearest its trigger. */
+@keyframes drop-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Leaving is faster than arriving. */
 @keyframes lift-out {
-  from { opacity: 1; transform: translateY(0) scale(1); }
-  to   { opacity: 0; transform: translateY(-4px) scale(0.99); }
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-4px); }
 }
 
-.hero-chunk { opacity: 0; }
+.stagger > *,
+.console-chunk { opacity: 0; }
 
 @media (prefers-reduced-motion: no-preference) {
-  .reveal.is-shown {
-    animation: rise 620ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-
   .stagger.is-shown > * {
-    animation: rise 520ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: rise 280ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
-  /* Delays are varied rather than metronomic. A uniform cascade reads as
-     generated, so the steps wobble by a few milliseconds while the whole
-     sequence still lands under 400ms. */
+  /* Varied, not metronomic. A uniform cascade reads as generated. */
   .stagger.is-shown > *:nth-child(1) { animation-delay: 0ms; }
-  .stagger.is-shown > *:nth-child(2) { animation-delay: 45ms; }
-  .stagger.is-shown > *:nth-child(3) { animation-delay: 82ms; }
-  .stagger.is-shown > *:nth-child(4) { animation-delay: 128ms; }
-  .stagger.is-shown > *:nth-child(5) { animation-delay: 164ms; }
-  .stagger.is-shown > *:nth-child(6) { animation-delay: 212ms; }
-  .stagger.is-shown > *:nth-child(7) { animation-delay: 246ms; }
-  .stagger.is-shown > *:nth-child(8) { animation-delay: 292ms; }
-  .stagger.is-shown > *:nth-child(9) { animation-delay: 328ms; }
-  .stagger.is-shown > *:nth-child(10) { animation-delay: 374ms; }
+  .stagger.is-shown > *:nth-child(2) { animation-delay: 26ms; }
+  .stagger.is-shown > *:nth-child(3) { animation-delay: 48ms; }
+  .stagger.is-shown > *:nth-child(4) { animation-delay: 76ms; }
+  .stagger.is-shown > *:nth-child(5) { animation-delay: 98ms; }
+  .stagger.is-shown > *:nth-child(6) { animation-delay: 128ms; }
+  .stagger.is-shown > *:nth-child(7) { animation-delay: 150ms; }
+  .stagger.is-shown > *:nth-child(8) { animation-delay: 178ms; }
+  .stagger.is-shown > *:nth-child(9) { animation-delay: 200ms; }
+  .stagger.is-shown > *:nth-child(10) { animation-delay: 228ms; }
 
-  /* Small overlay, light mass: short and clear. */
   details[open] > ul {
-    animation: drop-in 200ms cubic-bezier(0.2, 0, 0, 1);
+    animation: drop-in 160ms cubic-bezier(0.2, 0, 0, 1);
   }
 
-  /* Hero: six chunks in reading order, tight enough that the last lands inside
-     a second. This is the only staged entrance on the page. */
-  .hero-chunk {
-    animation: hero-in 560ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  /* The page header arrives in reading order, inside a third of a second. */
+  .console-chunk {
+    animation: rise 300ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
-  .hero-chunk:nth-child(1) { animation-delay: 0ms; }
-  .hero-chunk:nth-child(2) { animation-delay: 60ms; }
-  .hero-chunk:nth-child(3) { animation-delay: 120ms; }
-  .hero-chunk:nth-child(4) { animation-delay: 180ms; }
-  .hero-chunk:nth-child(5) { animation-delay: 240ms; }
-  .hero-chunk:nth-child(6) { animation-delay: 300ms; }
+  .console-chunk:nth-child(1) { animation-delay: 0ms; }
+  .console-chunk:nth-child(2) { animation-delay: 40ms; }
+  .console-chunk:nth-child(3) { animation-delay: 80ms; }
+  .console-chunk:nth-child(4) { animation-delay: 120ms; }
 
-  /* Focus arrives with a settle instead of a jump. The ring is visible from
-     the first frame; only its offset eases, so nothing is delayed. */
   :focus-visible {
-    transition: outline-offset 150ms cubic-bezier(0.2, 0, 0, 1);
+    transition: outline-offset 140ms cubic-bezier(0.2, 0, 0, 1);
   }
 }
 
-/* Closing, which previously had no motion at all. Softer than the entrance and
-   shorter, with an accelerating curve because it is leaving. Authored outside
-   the no-preference query on purpose: the reduced-motion reset below shortens
-   this animation to 0.01ms rather than removing it, so `animationend` still
-   fires and the panel closes immediately instead of waiting on the timeout. */
+/* Authored outside the no-preference query on purpose: the reduced-motion
+   reset below shortens this to 0.01ms rather than removing it, so
+   `animationend` still fires and the panel closes immediately instead of
+   waiting on the safety timeout. */
 details[open] > ul.is-closing {
-  animation: lift-out 140ms cubic-bezier(0.4, 0, 1, 1) forwards;
+  animation: lift-out 110ms cubic-bezier(0.4, 0, 1, 1) forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -309,9 +594,38 @@ details[open] > ul.is-closing {
 
   /* Content still arrives. It just does not travel to get here. The rule above
      is out-specified deliberately, so this fade survives the blanket reset. */
-  .reveal.is-shown,
   .stagger.is-shown > *,
-  .hero-chunk {
-    animation: settle 150ms linear forwards !important;
+  .console-chunk {
+    animation: settle 130ms linear forwards !important;
   }
+}
+
+/* A two-step pixel corner. The card used to carry a plain 1px border, which was the
+   most "box" thing on the page; the stepped cut is the pixel-art form of rounding and
+   it shapes the surface without an outline, because clip-path would erase a border.
+   `--p` is one pixel step, so the corner reads as two square notches at every size. */
+.pixel-cut {
+  --p: 4px;
+  clip-path: polygon(
+    calc(var(--p) * 2) 0,
+    calc(100% - var(--p) * 2) 0,
+    calc(100% - var(--p) * 2) var(--p),
+    calc(100% - var(--p)) var(--p),
+    calc(100% - var(--p)) calc(var(--p) * 2),
+    100% calc(var(--p) * 2),
+    100% calc(100% - var(--p) * 2),
+    calc(100% - var(--p)) calc(100% - var(--p) * 2),
+    calc(100% - var(--p)) calc(100% - var(--p)),
+    calc(100% - var(--p) * 2) calc(100% - var(--p)),
+    calc(100% - var(--p) * 2) 100%,
+    calc(var(--p) * 2) 100%,
+    calc(var(--p) * 2) calc(100% - var(--p)),
+    var(--p) calc(100% - var(--p)),
+    var(--p) calc(100% - var(--p) * 2),
+    0 calc(100% - var(--p) * 2),
+    0 calc(var(--p) * 2),
+    var(--p) calc(var(--p) * 2),
+    var(--p) var(--p),
+    calc(var(--p) * 2) var(--p)
+  );
 }
