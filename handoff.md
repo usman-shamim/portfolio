@@ -20,14 +20,16 @@ Two supporting documents are deliberately kept off the site:
 - `docs/scenarios.md` — worked illustrations, explicitly not delivered engagements.
 
 `app/globals.css` owns the design tokens and the motion system. The current
-direction is a **dense operator console**: border-led, a fixed left rail carrying
-position and current state, compact mono data, and hue reserved strictly for status
-(green running, amber attention, red fault). It shipped in **two themes**, dark by
-default and light on request, sharing one set of semantic token names. It replaced
-a paper specification sheet, which replaced an amber/graphite instrument panel,
-which replaced the original cyan AI-tool look. `app/opengraph-image.tsx` generates
-the share card from the dark palette, since a social card does not follow the
-reader's theme.
+direction is a **dense operator console**: a fixed left rail carrying position and
+current state, compact mono data, frame rules at every band and head, and entries
+separated by space rather than per-row hairlines. One brand **accent** (a warm
+amber) carries the hero name, the masthead wordmark and the field-report header;
+green running, amber attention and red fault remain the only state colours. It
+shipped in **two themes**, dark by default and light on request, sharing one set
+of semantic token names. It replaced a paper specification sheet, which replaced
+an amber/graphite instrument panel, which replaced the original cyan AI-tool look.
+`app/opengraph-image.tsx` generates the share card from the dark palette, since a
+social card does not follow the reader's theme.
 
 The full design constitution is `.commandcode/design/brief.md`. Read it before
 changing anything visual; it carries both token tables, the type roles, the

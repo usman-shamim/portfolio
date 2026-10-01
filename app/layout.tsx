@@ -93,9 +93,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 
         <SkipLink />
 
-        {/* One panel, centred and capped in width. The rail and the content column
-            are siblings in a flex row, so neither can drift out of step with the
-            other and the pair composes itself on any screen width. */}
+        {/* One panel, attached to both viewport edges. The rail and the content
+            column are siblings in a flex row, so neither can drift out of step with
+            the other and the pair composes itself on any screen width. The content
+            holds a lane inside the panel rather than the panel being capped. */}
         <div className="panel">
           <SiteRail />
 

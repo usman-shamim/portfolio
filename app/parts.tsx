@@ -40,8 +40,8 @@ export function SkipLink() {
 
 export function SiteRail() {
   return (
-    /* No background: the body paints the ground and the field grid, and the rail has to
-       let both through or the grid stops at the rail's edge and the composition looks
+    /* No background: the body paints the ground and the field, and the rail has to
+       let both through or the field stops at the rail's edge and the composition looks
        painted on rather than drawn. Nothing scrolls under this rail, so transparency
        costs nothing here. The sticky bar below is the opposite case and keeps its own
        ground. */

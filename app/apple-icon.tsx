@@ -11,8 +11,8 @@ import { FACE_SANS, faceSansSemibold } from "./og-fonts";
   is for.
 
   Same mark, same reasoning as `icon.tsx`: the site's own semibold sans, the ink ground
-  and the light ink, and no accent, because the brief reserves `signal` for state and a
-  logo is not a state.
+  and the light ink, and no accent, because the brief limits the accent to the name, the
+  wordmark and the field-report header and keeps `signal` for state.
 
   180px is the size iOS actually renders a home-screen icon at. The letter is set at the
   same ratio to the tile as in the 64px tab mark, so the two read as one mark rather

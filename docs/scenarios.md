@@ -56,6 +56,6 @@ unplanned outage.
 ## What these are not
 
 No client is named because none of these were delivered engagements. If you want a recorded
-deployment with numbers attached, the public repositories under `#work` are the honest place
-to look, and the private systems are described without links because the code is not mine to
-publish.
+deployment with numbers attached, the public repositories on the work page (`/work`) are the
+honest place to look, and the private systems are described without links because the code
+is not mine to publish.

@@ -2,7 +2,8 @@ import { ImageResponse } from "next/og";
 import { FACE_MONO, FACE_SANS, faceMonoRegular, faceSansRegular, faceSansSemibold } from "./og-fonts";
 
 /*
-  Generated rather than uploaded, so the card can never drift from the page.
+  Generated rather than uploaded, so no binary is committed and the card stays on
+  the site's palette and faces.
 
   It now carries the site's own two faces as well as its palette: IBM Plex Mono for
   the labels, IBM Plex Sans for the name and the sentence under it. Before this it

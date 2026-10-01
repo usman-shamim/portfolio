@@ -10,8 +10,9 @@ import { FACE_SANS, faceSansSemibold } from "./og-fonts";
   palette or the type: the same ink ground, the same light ink, and the site's own
   semibold sans rather than the renderer's default face.
 
-  No accent colour. The brief reserves `signal` for state, and a logo is not a
-  state; spending the accent here would make it decorative everywhere else.
+  No accent colour. The brief gives the one accent exactly three jobs — the name,
+  the wordmark and the field-report header — and keeps `signal` for state; a logo
+  is neither, and a fourth use would make the accent decorative everywhere else.
 
   A monogram rather than a second shape, because this is seen at 16px in a tab
   strip, where one bold letterform survives and anything finer turns to mush.

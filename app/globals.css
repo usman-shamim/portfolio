@@ -4,11 +4,11 @@
   Dense operator console, in two themes.
 
   Graphite ground, border-led structure, compact mono data. The palette is
-  deliberately hue-poor: every neutral is near-achromatic, and the only colours
-  on the page are status. Green means running, amber means attention, red means
-  fault — the annunciator convention the plant HMI world uses, so the colours
-  carry meaning rather than mood. Interaction is expressed with lightness, never
-  with hue.
+  deliberately restrained: every neutral is close to achromatic, one warm accent
+  names the brand, and the state colours are the only others on the page. Green
+  means running, amber means attention, red means fault — the annunciator
+  convention the plant HMI world uses, so the colours carry meaning rather than
+  mood. Interaction is expressed with lightness, never with hue.
 
   Both themes use the same semantic token names, so every `bg-ground`,
   `text-ink` and `border-line` in the app resolves correctly in either. Swapping
@@ -32,6 +32,7 @@
     ground / panel / raise    canvas, surface, raised surface
     line / line-strong        hairline border, structural rule
     ink / ink-2 / ink-3       text, muted text, label and metadata
+    accent                    brand: the name, the wordmark, the field-report header
     signal                    attention: current location, focus, in-progress
     running                   success: in service
     alert                     error: fault and failure
@@ -47,8 +48,9 @@
   spread, in the same order in both themes so the colours stay learnable. Colour
   never carries a state alone; every StatusMark also carries a written label.
 
-  The two theme blocks below declare the same role names. Changing a role means
-  changing it in the dark block and both light blocks.
+  Every theme block below declares the same role names: the dark default in
+  `:root` with its `data-theme="dark"` override, and the system-light and
+  `data-theme="light"` pair. Changing a role means changing it in all four.
 */
 
 :root {
@@ -455,7 +457,7 @@ a {
 /* ── Controls ───────────────────────────────────────────────────────────── */
 
 /* Interactive state changes name their properties, never `all`. Lightness
-   carries interaction; hue is reserved for state. */
+   carries interaction; hue belongs to the accent and the state colours. */
 .press {
   transition-property: color, background-color, border-color, opacity, translate, box-shadow;
   transition-duration: 140ms;
