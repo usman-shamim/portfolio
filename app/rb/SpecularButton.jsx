@@ -180,18 +180,21 @@ const SpecularButton = ({
       const dist = Math.hypot(dx, dy);
       // Over the button itself the light settles on the diagonal (framing the
       // corners) and gently sways with the cursor position within the button.
+      let nextAngle;
       if (dist === 0) {
         const nx = (e.clientX - cx) / (rect.width / 2);
         const ny = (cy - e.clientY) / (rect.height / 2);
-        pointerAngle = Math.atan2(2 / rect.height, -2 / rect.width) + nx * 0.3 + ny * 0.15;
+        nextAngle = Math.atan2(2 / rect.height, -2 / rect.width) + nx * 0.3 + ny * 0.15;
       } else {
-        pointerAngle = Math.atan2(cy - e.clientY, e.clientX - cx);
+        nextAngle = Math.atan2(cy - e.clientY, e.clientX - cx);
       }
+      const angleChanged = nextAngle !== pointerAngle;
+      pointerAngle = nextAngle;
       const t = Math.max(0, 1 - dist / Math.max(propsRef.current.proximity, 1));
       const next = t * t * (3 - 2 * t);
       const changed = next !== proximityT;
       proximityT = next;
-      if (changed) kick();
+      if (changed || (angleChanged && proximityT > 0)) kick();
     };
     const clearProximity = () => {
       if (proximityT === 0) return;
@@ -205,6 +208,7 @@ const SpecularButton = ({
     let angle = 2.4;
     let idleAngle = 2.4;
     let bright = 0;
+    let animating = false;
     let last = performance.now();
     let raf = 0;
 
@@ -222,6 +226,7 @@ const SpecularButton = ({
       if (reduceRef.current) {
         idleAngle = angle;
         bright = p.autoAnimate ? 1 : proximityT;
+        animating = false;
       } else {
         idleAngle += p.speed * dt;
         const steer = p.followMouse && pointerAngle != null && (!p.autoAnimate || proximityT > 0);
@@ -232,6 +237,12 @@ const SpecularButton = ({
         // Shine fades in with pointer proximity unless autoAnimate keeps it on
         const brightTarget = p.autoAnimate ? 1 : proximityT;
         bright += (brightTarget - bright) * (1 - Math.exp(-dt * 8));
+
+        // Stop once the eased angle and shine have reached their targets, so a
+        // converged non-zero shine schedules no further frames.
+        const angleSettled = !steer || Math.abs(diff) < 0.002;
+        const brightSettled = Math.abs(brightTarget - bright) < 0.002;
+        animating = p.autoAnimate || !(angleSettled && brightSettled);
       }
 
       lineC.set(p.lineColor);
@@ -250,8 +261,7 @@ const SpecularButton = ({
     const tick = now => {
       raf = 0;
       render(now);
-      const p = propsRef.current;
-      if (!reduceRef.current && (p.autoAnimate || bright > 0.001)) {
+      if (animating) {
         raf = requestAnimationFrame(tick);
       }
     };
