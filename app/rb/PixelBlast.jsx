@@ -351,6 +351,7 @@ const PixelBlast = ({
     if (mustReinit) {
       if (threeRef.current) {
         const t = threeRef.current;
+        t.motionQuery?.removeEventListener('change', t.onMotion);
         t.resizeObserver?.disconnect();
         cancelAnimationFrame(t.raf);
         t.quad?.geometry.dispose();
@@ -507,7 +508,8 @@ const PixelBlast = ({
       });
       let raf = 0;
       // Adapted: one frame then stop when the visitor asks for reduced motion.
-      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+      let reduce = motionQuery.matches;
       const animate = () => {
         if (autoPauseOffscreen && !visibilityRef.current.visible) {
           raf = requestAnimationFrame(animate);
@@ -528,8 +530,14 @@ const PixelBlast = ({
           composer.render();
         } else renderer.render(scene, camera);
         if (!reduce) raf = requestAnimationFrame(animate);
+        else raf = 0;
       };
       raf = requestAnimationFrame(animate);
+      const onMotion = () => {
+        reduce = motionQuery.matches;
+        if (!reduce && !raf) raf = requestAnimationFrame(animate);
+      };
+      motionQuery.addEventListener('change', onMotion);
       threeRef.current = {
         renderer,
         scene,
@@ -540,6 +548,8 @@ const PixelBlast = ({
         uniforms,
         resizeObserver: ro,
         raf,
+        motionQuery,
+        onMotion,
         quad,
         timeOffset,
         composer,
@@ -574,6 +584,7 @@ const PixelBlast = ({
       if (threeRef.current && mustReinit) return;
       if (!threeRef.current) return;
       const t = threeRef.current;
+      t.motionQuery?.removeEventListener('change', t.onMotion);
       t.resizeObserver?.disconnect();
       cancelAnimationFrame(t.raf);
       t.quad?.geometry.dispose();

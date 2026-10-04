@@ -99,7 +99,8 @@ const TechText = ({
     const scratchCtx = scratch.getContext('2d');
     if (!container || !canvas || !ctx || !scratchCtx) return undefined;
 
-    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const motionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    let reducedMotion = motionQuery?.matches ?? false;
     let width = 1;
     let height = 1;
     let dpr = 1;
@@ -577,6 +578,12 @@ const TechText = ({
     };
     wakeRef.current = wake;
 
+    const onMotion = () => {
+      reducedMotion = motionQuery?.matches ?? false;
+      wake();
+    };
+    motionQuery?.addEventListener('change', onMotion);
+
     const resize = () => {
       width = Math.max(1, container.clientWidth);
       height = Math.max(1, container.clientHeight);
@@ -649,6 +656,7 @@ const TechText = ({
     return () => {
       alive = false;
       cancelAnimationFrame(raf);
+      motionQuery?.removeEventListener('change', onMotion);
       wakeRef.current = () => {};
       resizeObserver.disconnect();
       intersectionObserver.disconnect();

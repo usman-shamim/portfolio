@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useCallback, useEffect } from 'react';
+import { useRef, useCallback, useEffect, useState } from 'react';
 import './BorderGlow.css';
 
 function parseHSL(hslStr) {
@@ -36,9 +36,17 @@ function buildGradientVars(colors) {
 }
 
 function isLightColor(color) {
-  const value = color.trim().replace('#', '');
-  if (!/^[\da-f]{3}([\da-f]{3})?$/i.test(value)) return false;
-  const hex = value.length === 3 ? value.split('').map(char => char + char).join('') : value;
+  const value = color.trim();
+  const oklch = value.match(/^oklch\(\s*([\d.]+)(%)?/i);
+  if (oklch) return parseFloat(oklch[1]) / (oklch[2] ? 100 : 1) > 0.6;
+  const rgb = value.match(/^rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)/i);
+  if (rgb) {
+    const [red, green, blue] = rgb.slice(1, 4).map(Number);
+    return red * 0.2126 + green * 0.7152 + blue * 0.0722 > 180;
+  }
+  const hexValue = value.replace('#', '');
+  if (!/^[\da-f]{3}([\da-f]{3})?$/i.test(hexValue)) return false;
+  const hex = hexValue.length === 3 ? hexValue.split('').map(char => char + char).join('') : hexValue;
   const red = parseInt(hex.slice(0, 2), 16);
   const green = parseInt(hex.slice(2, 4), 16);
   const blue = parseInt(hex.slice(4, 6), 16);
@@ -75,6 +83,7 @@ const BorderGlow = ({
   fillOpacity = 0.5,
 }) => {
   const cardRef = useRef(null);
+  const [lightSurface, setLightSurface] = useState(false);
 
   const getCenterOfElement = useCallback((el) => {
     const { width, height } = el.getBoundingClientRect();
@@ -139,8 +148,17 @@ const BorderGlow = ({
     });
   }, [animated]);
 
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el) return;
+    const read = () => setLightSurface(isLightColor(getComputedStyle(el).backgroundColor));
+    read();
+    const observer = new MutationObserver(read);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => observer.disconnect();
+  }, []);
+
   const glowVars = buildGlowVars(glowColor, glowIntensity);
-  const lightSurface = isLightColor(backgroundColor);
 
   return (
     <div
