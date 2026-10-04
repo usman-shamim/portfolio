@@ -510,9 +510,13 @@ const PixelBlast = ({
       // Adapted: one frame then stop when the visitor asks for reduced motion.
       const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
       let reduce = motionQuery.matches;
+      const schedule = () => {
+        raf = requestAnimationFrame(animate);
+        if (threeRef.current) threeRef.current.raf = raf;
+      };
       const animate = () => {
         if (autoPauseOffscreen && !visibilityRef.current.visible) {
-          raf = requestAnimationFrame(animate);
+          schedule();
           return;
         }
         uniforms.uTime.value = timeOffset + clock.getElapsedTime() * speedRef.current;
@@ -529,13 +533,13 @@ const PixelBlast = ({
           });
           composer.render();
         } else renderer.render(scene, camera);
-        if (!reduce) raf = requestAnimationFrame(animate);
+        if (!reduce) schedule();
         else raf = 0;
       };
       raf = requestAnimationFrame(animate);
       const onMotion = () => {
         reduce = motionQuery.matches;
-        if (!reduce && !raf) raf = requestAnimationFrame(animate);
+        if (!reduce && !raf) schedule();
       };
       motionQuery.addEventListener('change', onMotion);
       threeRef.current = {
