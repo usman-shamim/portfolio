@@ -211,14 +211,23 @@ const LineSidebar = ({
                 itemRefs.current[index] = el;
               }}
               className="line-sidebar__item"
-              aria-current={activeIndex === index ? 'page' : undefined}
             >
               {href ? (
-                <Link href={href} className="line-sidebar__link" onClick={() => handleClick(index, label)}>
+                <Link
+                  href={href}
+                  className="line-sidebar__link"
+                  aria-current={activeIndex === index ? 'page' : undefined}
+                  onClick={() => handleClick(index, label)}
+                >
                   {inner}
                 </Link>
               ) : (
-                <button type="button" className="line-sidebar__link" onClick={() => handleClick(index, label)}>
+                <button
+                  type="button"
+                  className="line-sidebar__link"
+                  aria-current={activeIndex === index ? 'page' : undefined}
+                  onClick={() => handleClick(index, label)}
+                >
                   {inner}
                 </button>
               )}

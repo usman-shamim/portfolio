@@ -97,6 +97,7 @@ const SpecularButton = ({
   const btnRef = useRef(null);
   const fxRef = useRef(null);
   const propsRef = useRef({});
+  const repaintRef = useRef(() => {});
 
   propsRef.current = { radius, lineColor, baseColor, intensity, shineSize, shineFade, thickness, speed, followMouse, proximity, autoAnimate };
 
@@ -159,7 +160,10 @@ const SpecularButton = ({
       program.uniforms.uCenter.value = [(PAD + w / 2) * dpr, (PAD + h / 2) * dpr];
       program.uniforms.uHalfSize.value = [(w / 2) * dpr, (h / 2) * dpr];
     };
-    const ro = new ResizeObserver(resize);
+    const ro = new ResizeObserver(() => {
+      resize();
+      kick();
+    });
     ro.observe(btn);
     resize();
 
@@ -259,9 +263,11 @@ const SpecularButton = ({
     reduceQuery.addEventListener('change', onMotion);
     window.addEventListener('pointermove', onPointerMove);
 
+    repaintRef.current = kick;
     kick();
 
     return () => {
+      repaintRef.current = () => {};
       cancelAnimationFrame(raf);
       reduceQuery.removeEventListener('change', onMotion);
       ro.disconnect();
@@ -270,6 +276,10 @@ const SpecularButton = ({
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
   }, []);
+
+  useEffect(() => {
+    repaintRef.current();
+  }, [lineColor, baseColor, radius, intensity, shineSize, shineFade, thickness]);
 
   const Tag = href ? 'a' : 'button';
   const linkProps = href

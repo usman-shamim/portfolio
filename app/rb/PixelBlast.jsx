@@ -426,7 +426,10 @@ const PixelBlast = ({
         uniforms.uPixelSize.value = pixelSize * renderer.getPixelRatio();
       };
       setSize();
-      const ro = new ResizeObserver(setSize);
+      const ro = new ResizeObserver(() => {
+        setSize();
+        if (threeRef.current?.motionQuery?.matches) threeRef.current.renderFrame();
+      });
       ro.observe(container);
       const randomFloat = () => {
         if (typeof window !== 'undefined' && window.crypto?.getRandomValues) {
@@ -514,11 +517,7 @@ const PixelBlast = ({
         raf = requestAnimationFrame(animate);
         if (threeRef.current) threeRef.current.raf = raf;
       };
-      const animate = () => {
-        if (autoPauseOffscreen && !visibilityRef.current.visible) {
-          schedule();
-          return;
-        }
+      const renderFrame = () => {
         uniforms.uTime.value = timeOffset + clock.getElapsedTime() * speedRef.current;
         if (liquidEffect) liquidEffect.uniforms.get('uTime').value = uniforms.uTime.value;
         if (composer) {
@@ -533,6 +532,13 @@ const PixelBlast = ({
           });
           composer.render();
         } else renderer.render(scene, camera);
+      };
+      const animate = () => {
+        if (autoPauseOffscreen && !visibilityRef.current.visible) {
+          schedule();
+          return;
+        }
+        renderFrame();
         if (!reduce) schedule();
         else raf = 0;
       };
@@ -554,6 +560,7 @@ const PixelBlast = ({
         raf,
         motionQuery,
         onMotion,
+        renderFrame,
         quad,
         timeOffset,
         composer,
@@ -582,6 +589,7 @@ const PixelBlast = ({
         if (uFreq) uFreq.value = liquidWobbleSpeed;
       }
       if (t.touch) t.touch.radiusScale = liquidRadius;
+      if (t.motionQuery?.matches) t.renderFrame();
     }
     prevConfigRef.current = cfg;
     return () => {

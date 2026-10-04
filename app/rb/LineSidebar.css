@@ -79,11 +79,11 @@
   transform: translateY(-50%) scaleX(calc(0.7 + var(--effect, 0) * 0.5));
 }
 
-.line-sidebar__item[aria-current='page'] .line-sidebar__label {
+.line-sidebar__link[aria-current='page'] .line-sidebar__label {
   color: var(--ink);
 }
 
-.line-sidebar__item[aria-current='page'] .line-sidebar__marker {
+.line-sidebar__link[aria-current='page'] .line-sidebar__marker {
   background-color: var(--signal);
 }
 
