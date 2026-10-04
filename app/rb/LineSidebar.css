@@ -79,6 +79,14 @@
   transform: translateY(-50%) scaleX(calc(0.7 + var(--effect, 0) * 0.5));
 }
 
+.line-sidebar__item[aria-current='page'] .line-sidebar__label {
+  color: var(--ink);
+}
+
+.line-sidebar__item[aria-current='page'] .line-sidebar__marker {
+  background-color: var(--signal);
+}
+
 /* Short static tick centered in the gap between two menu items */
 .line-sidebar--markers .line-sidebar__item:not(:last-child)::after {
   content: '';

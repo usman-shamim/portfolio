@@ -58,6 +58,7 @@ const LineSidebar = ({
   const lastRef = useRef(0);
   const activeRef = useRef(defaultActive);
   const smoothingRef = useRef(smoothing);
+  const reduceRef = useRef(false);
   const [activeIndexState, setActiveIndexState] = useState(defaultActive);
   const activeIndex = activeIndexProp ?? activeIndexState;
 
@@ -67,6 +68,10 @@ const LineSidebar = ({
   // Single rAF loop that eases every item's --effect toward its target using
   // frame-rate independent exponential smoothing, so color, shift and scale
   // all move together without staggering CSS transitions.
+  const targetFor = useCallback(i => {
+    return Math.max(targetsRef.current[i] || 0, activeRef.current === i ? 1 : 0);
+  }, []);
+
   const runFrame = useCallback(now => {
     const dt = Math.min((now - lastRef.current) / 1000, 0.05);
     lastRef.current = now;
@@ -78,7 +83,7 @@ const LineSidebar = ({
     for (let i = 0; i < items.length; i++) {
       const el = items[i];
       if (!el) continue;
-      const target = Math.max(targetsRef.current[i] || 0, activeRef.current === i ? 1 : 0);
+      const target = targetFor(i);
       const cur = currentRef.current[i] || 0;
       const next = cur + (target - cur) * k;
       const settled = Math.abs(target - next) < 0.0015;
@@ -89,16 +94,33 @@ const LineSidebar = ({
     }
 
     rafRef.current = moving ? requestAnimationFrame(runFrame) : null;
-  }, []);
+  }, [targetFor]);
+
+  const applyTargets = useCallback(() => {
+    const items = itemRefs.current;
+    for (let i = 0; i < items.length; i++) {
+      const el = items[i];
+      if (!el) continue;
+      const value = targetFor(i);
+      currentRef.current[i] = value;
+      el.style.setProperty('--effect', value.toFixed(4));
+    }
+  }, [targetFor]);
 
   const startLoop = useCallback(() => {
     if (rafRef.current != null) {
       cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+
+    if (reduceRef.current) {
+      applyTargets();
+      return;
     }
 
     lastRef.current = performance.now();
     rafRef.current = requestAnimationFrame(runFrame);
-  }, [runFrame]);
+  }, [applyTargets, runFrame]);
 
   const handlePointerMove = useCallback(
     e => {
@@ -137,13 +159,20 @@ const LineSidebar = ({
     startLoop();
   }, [activeIndex, startLoop]);
 
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => {
+      reduceRef.current = query.matches;
+      startLoop();
+    };
+    update();
+    query.addEventListener('change', update);
+    return () => {
+      query.removeEventListener('change', update);
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
-    },
-    []
-  );
+    };
+  }, [startLoop]);
 
   return (
     <nav

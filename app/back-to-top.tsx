@@ -33,7 +33,7 @@ export function BackToTop() {
         size={46}
         padColor="var(--raise)"
         iconColor="var(--ink-2)"
-        accentColor="var(--accent)"
+        accentColor="var(--ink-2)"
         wellColor="var(--panel)"
         bandColor="var(--line-strong)"
         tapSends

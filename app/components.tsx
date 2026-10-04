@@ -137,7 +137,7 @@ export function RailNav() {
         ariaLabel="Sections"
         items={SECTIONS.map((s: Section) => ({ label: s.label, href: `/${s.slug}` }))}
         activeIndex={active >= 0 ? active : null}
-        accentColor="var(--accent)"
+        accentColor="var(--ink-2)"
         textColor="var(--ink-3)"
         markerColor="var(--line-strong)"
         fontSize={0.9}
