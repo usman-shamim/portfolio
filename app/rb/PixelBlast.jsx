@@ -303,6 +303,18 @@ void main(){
 
 const MAX_CLICKS = 10;
 
+function disposeThree(t) {
+  t.motionQuery?.removeEventListener('change', t.onMotion);
+  t.resizeObserver?.disconnect();
+  cancelAnimationFrame(t.raf);
+  t.quad?.geometry.dispose();
+  t.material.dispose();
+  t.composer?.dispose();
+  t.renderer.dispose();
+  t.renderer.forceContextLoss();
+  t.renderer.domElement.parentElement?.removeChild(t.renderer.domElement);
+}
+
 const PixelBlast = ({
   variant = 'square',
   pixelSize = 3,
@@ -350,16 +362,7 @@ const PixelBlast = ({
     }
     if (mustReinit) {
       if (threeRef.current) {
-        const t = threeRef.current;
-        t.motionQuery?.removeEventListener('change', t.onMotion);
-        t.resizeObserver?.disconnect();
-        cancelAnimationFrame(t.raf);
-        t.quad?.geometry.dispose();
-        t.material.dispose();
-        t.composer?.dispose();
-        t.renderer.dispose();
-        t.renderer.forceContextLoss();
-        if (t.renderer.domElement.parentElement === container) container.removeChild(t.renderer.domElement);
+        disposeThree(threeRef.current);
         threeRef.current = null;
       }
       // Adapted: a device without WebGL must not take the page down with it.
@@ -592,21 +595,6 @@ const PixelBlast = ({
       if (t.motionQuery?.matches) t.renderFrame();
     }
     prevConfigRef.current = cfg;
-    return () => {
-      if (threeRef.current && mustReinit) return;
-      if (!threeRef.current) return;
-      const t = threeRef.current;
-      t.motionQuery?.removeEventListener('change', t.onMotion);
-      t.resizeObserver?.disconnect();
-      cancelAnimationFrame(t.raf);
-      t.quad?.geometry.dispose();
-      t.material.dispose();
-      t.composer?.dispose();
-      t.renderer.dispose();
-      t.renderer.forceContextLoss();
-      if (t.renderer.domElement.parentElement === container) container.removeChild(t.renderer.domElement);
-      threeRef.current = null;
-    };
   }, [
     antialias,
     liquid,
@@ -629,6 +617,15 @@ const PixelBlast = ({
     color,
     speed
   ]);
+
+  useEffect(() => {
+    return () => {
+      if (threeRef.current) {
+        disposeThree(threeRef.current);
+        threeRef.current = null;
+      }
+    };
+  }, []);
 
   return (
     <div

@@ -136,7 +136,7 @@ export function RailNav() {
       <LineSidebar
         ariaLabel="Sections"
         items={SECTIONS.map((s: Section) => ({ label: s.label, href: `/${s.slug}` }))}
-        activeIndex={active >= 0 ? active : null}
+        activeIndex={active}
         accentColor="var(--ink-2)"
         textColor="var(--ink-3)"
         markerColor="var(--line-strong)"

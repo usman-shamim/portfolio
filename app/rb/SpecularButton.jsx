@@ -193,6 +193,14 @@ const SpecularButton = ({
       proximityT = next;
       if (changed) kick();
     };
+    const clearProximity = () => {
+      if (proximityT === 0) return;
+      proximityT = 0;
+      kick();
+    };
+    const onPointerOut = e => {
+      if (!e.relatedTarget) clearProximity();
+    };
 
     let angle = 2.4;
     let idleAngle = 2.4;
@@ -264,6 +272,10 @@ const SpecularButton = ({
     };
     reduceQuery.addEventListener('change', onMotion);
     window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', clearProximity);
+    window.addEventListener('pointercancel', clearProximity);
+    window.addEventListener('pointerout', onPointerOut);
+    document.documentElement.addEventListener('pointerleave', clearProximity);
 
     repaintRef.current = kick;
     kick();
@@ -274,6 +286,10 @@ const SpecularButton = ({
       reduceQuery.removeEventListener('change', onMotion);
       ro.disconnect();
       window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', clearProximity);
+      window.removeEventListener('pointercancel', clearProximity);
+      window.removeEventListener('pointerout', onPointerOut);
+      document.documentElement.removeEventListener('pointerleave', clearProximity);
       if (gl.canvas.parentNode === fx) fx.removeChild(gl.canvas);
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
