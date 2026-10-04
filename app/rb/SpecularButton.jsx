@@ -185,8 +185,8 @@ const SpecularButton = ({
       }
       const t = Math.max(0, 1 - dist / Math.max(propsRef.current.proximity, 1));
       proximityT = t * t * (3 - 2 * t);
+      if (proximityT > 0) kick();
     };
-    window.addEventListener('pointermove', onPointerMove);
 
     let angle = 2.4;
     let idleAngle = 2.4;
@@ -194,24 +194,31 @@ const SpecularButton = ({
     let last = performance.now();
     let raf = 0;
 
+    const reduceQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const reduceRef = { current: reduceQuery.matches };
+
     const lineC = new Color();
     const baseC = new Color();
 
-    const update = now => {
-      raf = requestAnimationFrame(update);
+    const render = now => {
       const dt = Math.min((now - last) / 1000, 0.05);
       last = now;
       const p = propsRef.current;
 
-      idleAngle += p.speed * dt;
-      const steer = p.followMouse && pointerAngle != null && (!p.autoAnimate || proximityT > 0);
-      const target = steer ? pointerAngle : idleAngle;
-      const diff = ((target - angle + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
-      angle += diff * (1 - Math.exp(-dt * 7));
+      if (reduceRef.current) {
+        idleAngle = angle;
+        bright = p.autoAnimate ? 1 : proximityT;
+      } else {
+        idleAngle += p.speed * dt;
+        const steer = p.followMouse && pointerAngle != null && (!p.autoAnimate || proximityT > 0);
+        const target = steer ? pointerAngle : idleAngle;
+        const diff = ((target - angle + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
+        angle += diff * (1 - Math.exp(-dt * 7));
 
-      // Shine fades in with pointer proximity unless autoAnimate keeps it on
-      const brightTarget = p.autoAnimate ? 1 : proximityT;
-      bright += (brightTarget - bright) * (1 - Math.exp(-dt * 8));
+        // Shine fades in with pointer proximity unless autoAnimate keeps it on
+        const brightTarget = p.autoAnimate ? 1 : proximityT;
+        bright += (brightTarget - bright) * (1 - Math.exp(-dt * 8));
+      }
 
       lineC.set(p.lineColor);
       baseC.set(p.baseColor);
@@ -225,10 +232,38 @@ const SpecularButton = ({
       program.uniforms.uThickness.value = p.thickness * dpr;
       renderer.render({ scene: mesh });
     };
-    raf = requestAnimationFrame(update);
+
+    const tick = now => {
+      raf = 0;
+      render(now);
+      const p = propsRef.current;
+      if (!reduceRef.current && (p.autoAnimate || bright > 0.001)) {
+        raf = requestAnimationFrame(tick);
+      }
+    };
+
+    const kick = () => {
+      if (raf) return;
+      last = performance.now();
+      raf = requestAnimationFrame(tick);
+    };
+
+    const onMotion = () => {
+      reduceRef.current = reduceQuery.matches;
+      if (reduceRef.current && raf) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+      }
+      kick();
+    };
+    reduceQuery.addEventListener('change', onMotion);
+    window.addEventListener('pointermove', onPointerMove);
+
+    kick();
 
     return () => {
       cancelAnimationFrame(raf);
+      reduceQuery.removeEventListener('change', onMotion);
       ro.disconnect();
       window.removeEventListener('pointermove', onPointerMove);
       if (gl.canvas.parentNode === fx) fx.removeChild(gl.canvas);

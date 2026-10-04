@@ -268,7 +268,7 @@ export default function SlingButton({
     const g = grip.current;
     if (!g || g.id !== pointerId) return;
     grip.current = null;
-    skipClick.current = true;
+    skipClick.current = !cancelled;
     try {
       padRef.current?.releasePointerCapture(pointerId);
     } catch {}

@@ -12,7 +12,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { SpecularButton } from "./specular";
 
-const LINE: Record<string, string> = { dark: "#ffb058", light: "#8c4400" };
+const LINE: Record<string, string> = { dark: "#eae7e3", light: "#16130f" };
 const BASE: Record<string, string> = { dark: "#4c473f", light: "#bcb6af" };
 const ALERT: Record<string, string> = { dark: "#ee5744", light: "#7a0b03" };
 
