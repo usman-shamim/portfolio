@@ -188,8 +188,10 @@ const SpecularButton = ({
         pointerAngle = Math.atan2(cy - e.clientY, e.clientX - cx);
       }
       const t = Math.max(0, 1 - dist / Math.max(propsRef.current.proximity, 1));
-      proximityT = t * t * (3 - 2 * t);
-      if (proximityT > 0) kick();
+      const next = t * t * (3 - 2 * t);
+      const changed = next !== proximityT;
+      proximityT = next;
+      if (changed) kick();
     };
 
     let angle = 2.4;

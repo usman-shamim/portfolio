@@ -329,6 +329,7 @@ body {
   font-weight: 400;
   letter-spacing: 0;
   justify-content: center;
+  border: 1px solid var(--line-strong);
   box-shadow: none;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
