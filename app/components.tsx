@@ -14,9 +14,27 @@ import {
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
+  type ReactElement,
   type ReactNode,
 } from "react";
+import type { IconSvgElement } from "@hugeicons/react";
+import {
+  Call02Icon,
+  CodeCircleIcon,
+  RoboticIcon,
+  WorkflowCircle01Icon,
+} from "@hugeicons/core-free-icons";
 import { SECTIONS, type Section } from "./content";
+import LineSidebarRaw from "./rb/LineSidebar";
+import { IconMark } from "./icon-mark";
+import { SpecularAction } from "./specular-action";
+
+/* The vendored component ships as .jsx, so its props are inferred from its own
+   defaults (items: string[], activeIndex: null). Cast once to the shape this
+   site passes rather than casting at the call site. */
+const LineSidebar = LineSidebarRaw as unknown as (
+  props: Record<string, unknown>
+) => ReactElement;
 
 function cls(...args: (string | false | undefined | null)[]) {
   return args.filter(Boolean).join(" ");
@@ -108,32 +126,29 @@ function ChevronDown({ className = "h-3 w-3" }: { className?: string }) {
 
 export function RailNav() {
   const pathname = usePathname();
+  const active = SECTIONS.findIndex((s: Section) => isActive(pathname, s.slug));
 
+  /* React Bits LineSidebar carries the rail's routes on desktop. Its proximity
+     effect colours and nudges the item nearest the cursor; the active route is
+     driven from the pathname so the current section is always marked. */
   return (
-    <nav aria-label="Sections" className="gutter">
-      <ul>
-        {SECTIONS.map((s: Section) => {
-          const active = isActive(pathname, s.slug);
-          return (
-            <li key={s.slug}>
-              <Link
-                href={`/${s.slug}`}
-                aria-current={active ? "page" : undefined}
-                className={cls(
-                  "press flex min-h-11 items-center gap-3 border-s-2 ps-2.5 pe-2 text-sm active:translate-y-px",
-                  active
-                    ? "border-signal text-ink"
-                    : "border-transparent text-ink-3 hover:border-line-strong hover:text-ink-2"
-                )}
-              >
-                <span className="mono text-[11px] text-ink-3">{s.index}</span>
-                {s.label}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
+    <div className="gutter">
+      <LineSidebar
+        ariaLabel="Sections"
+        items={SECTIONS.map((s: Section) => ({ label: s.label, href: `/${s.slug}` }))}
+        activeIndex={active >= 0 ? active : null}
+        accentColor="var(--accent)"
+        textColor="var(--ink-3)"
+        markerColor="var(--line-strong)"
+        fontSize={0.9}
+        itemGap={13}
+        maxShift={9}
+        proximityRadius={64}
+        markerLength={16}
+        showIndex
+        showMarker
+      />
+    </div>
   );
 }
 
@@ -271,7 +286,15 @@ export function CompactNav() {
 
 /* ── Services ──
    An index rather than a grid of equal cards. The number and name carry the
-   weight on the left, the terms sit on the right, spacing does the separating. */
+   weight on the left, the terms sit on the right, spacing does the separating.
+   One Hugeicons mark per service, in the label tone. */
+
+const SERVICE_ICON: Record<string, IconSvgElement> = {
+  "AI agents": RoboticIcon,
+  "Workflow automation": WorkflowCircle01Icon,
+  "Web development": CodeCircleIcon,
+  "Voice receptionist": Call02Icon,
+};
 
 export function ServicesList({
   items,
@@ -304,8 +327,9 @@ export function ServicesList({
           key={s.name}
           className="grid gap-x-8 gap-y-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]"
         >
-          <div className="flex items-baseline gap-3">
+          <div className="flex items-center gap-3">
             <span className="mono text-[11px] text-ink-3">{String(i + 1).padStart(2, "0")}</span>
+            <IconMark icon={SERVICE_ICON[s.name]} className="h-[18px] w-[18px] shrink-0 text-ink-3" />
             <h3 className="text-lg font-semibold text-ink">{s.name}</h3>
           </div>
           <div>
@@ -368,16 +392,7 @@ export function CopyEmail({ address }: { address: string }) {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={copy}
-        className={cls(
-          "press inline-flex min-h-11 w-full items-center justify-center gap-2 border px-4 text-sm sm:w-auto sm:justify-start",
-          state === "failed"
-            ? "border-alert bg-panel text-alert"
-            : "border-line-strong bg-panel text-ink-2 hover:border-ink-3 hover:text-ink active:translate-y-px"
-        )}
-      >
+      <SpecularAction onClick={copy} tone={state === "failed" ? "alert" : "normal"}>
         {/* Both glyphs stay mounted and cross-fade, so the change reads as one
             icon becoming another rather than a swap. */}
         <span className="icon-swap h-4 w-4" aria-hidden="true">
@@ -385,7 +400,7 @@ export function CopyEmail({ address }: { address: string }) {
           <CheckIcon className={cls("absolute inset-0 h-4 w-4", state !== "copied" && "is-off")} />
         </span>
         {label}
-      </button>
+      </SpecularAction>
 
       {/* Present from first paint so the change is announced, not missed. */}
       <span aria-live="polite" className="sr-only">
@@ -676,8 +691,8 @@ class Pixel {
 }
 
 const CTA_CLASS: Record<"primary" | "secondary", string> = {
-  primary: "border-ink bg-ink text-ground hover:border-ink-2 hover:bg-ink-2",
-  secondary: "border-line-strong text-ink-2 hover:border-ink-3 hover:text-ink",
+  primary: "border-accent bg-accent text-ground hover:brightness-110",
+  secondary: "border-line-strong text-ink-2 hover:border-accent hover:text-ink",
 };
 
 export function PixelCta({
@@ -782,7 +797,7 @@ export function PixelCta({
       onFocus={enter}
       onBlur={leave}
       className={cls(
-        "press relative inline-flex min-h-11 w-full items-center justify-center overflow-hidden border px-4 text-sm font-medium active:translate-y-px sm:w-auto",
+        "press relative inline-flex min-h-11 w-full items-center justify-center overflow-hidden rounded-lg border px-5 text-sm font-medium active:translate-y-px sm:w-auto",
         CTA_CLASS[variant]
       )}
     >

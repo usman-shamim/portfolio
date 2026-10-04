@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Ledger, PageHeader, Row, SectionTrail } from "../parts";
 import { PRIVATE_SYSTEMS, section } from "../content";
+import { SquareLock01Icon } from "@hugeicons/core-free-icons";
 
 const meta = section("private");
 
@@ -16,7 +17,14 @@ export default function PrivatePage() {
       <div className="gutter py-10 md:py-12">
         <Ledger>
           {PRIVATE_SYSTEMS.map((p) => (
-            <Row key={p.title} title={p.title} meta={p.meta} detail={p.detail} tags={p.tags} />
+            <Row
+              key={p.title}
+              title={p.title}
+              meta={p.meta}
+              detail={p.detail}
+              tags={p.tags}
+              mark={SquareLock01Icon}
+            />
           ))}
         </Ledger>
       </div>

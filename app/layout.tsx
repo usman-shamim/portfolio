@@ -1,36 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
+import { display, plexMono, plexSans } from "./fonts";
 import { SiteRail, SkipLink, TopBar } from "./parts";
 import { DISCIPLINES, NAME, ROLE } from "./content";
-import { PixelField } from "./components";
+import { RbBackground } from "./rb-background";
+import { BackToTop } from "./back-to-top";
 
-/*
-  The pair, and why these two.
-
-  The object this site imitates is a plant instrument panel and the datasheet that
-  ships with it: a face you read the labels in, and a face you scan the numbers
-  off. IBM Plex was commissioned as an engineering type system, and the mono was
-  drawn alongside the sans so the two share structure and figures rather than
-  merely coexisting. That split, a label face and a readout face, is the panel.
-
-  What this replaced: Geist, which is the create-next-app default. It was never
-  chosen, every other Next.js project ships it, and the smell report recorded
-  exactly that as its one open suspicion. Nothing else about the type was wrong,
-  which is why the scale, the measure and the role split are unchanged here.
-*/
-const plexSans = IBM_Plex_Sans({
-  variable: "--font-sans-stack",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-});
-
-const plexMono = IBM_Plex_Mono({
-  variable: "--font-mono-stack",
-  subsets: ["latin"],
-  weight: ["400", "500"],
-});
+/* The faces are defined in ./fonts; the reasoning lives with them. */
 
 /* An absolute base so the social card resolves off-domain. Set
    NEXT_PUBLIC_SITE_URL at deploy; localhost is the fallback. */
@@ -77,13 +54,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
          so the attribute on the client differs from the server's markup. That
          difference is the whole mechanism, and it is not an error. */
       suppressHydrationWarning
-      className={`${plexSans.variable} ${plexMono.variable} h-full antialiased`}
+      className={`${plexSans.variable} ${plexMono.variable} ${display.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
       <body className="flex min-h-full flex-col bg-ground text-ink">
-        <PixelField />
+        <RbBackground />
 
         {/* The reveals are gated on JavaScript. Without this, a visitor with
             scripting off would see the staggered lists stay at opacity 0. */}
@@ -106,6 +83,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <main id="main" tabIndex={-1} className="flex-1">
               {children}
             </main>
+
+            <BackToTop />
 
             <footer className="band pad-safe-bottom gutter mt-16 py-6">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
