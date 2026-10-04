@@ -184,7 +184,7 @@
 */
 @media (prefers-contrast: more) {
   /* Texture works against legibility, so it goes. */
-  .pixel-field {
+  .rb-blast {
     display: none;
   }
 
@@ -301,23 +301,96 @@ body {
   outline-offset: 2px;
 }
 
-/*
-  The field. The curved, dithered glow that replaced the ruled grid. The shape lives
-  on a canvas in `components.tsx`; this class only has to hold it in place. Fixed so
-  it never scrolls, `z-index: -1` so it sits above the body's ground and below all
-  content, and `pointer-events: none` so it can never take a click. The canvas is
-  drawn at cell resolution, so `pixelated` keeps the squares crisp instead of soft.
-  Unlike the grid it is drawn at every width, because a glow is composition, not a
-  module: it means the same thing on a phone as on a monitor.
-*/
-.pixel-field {
+/* React Bits PixelBlast, held full-viewport behind everything. */
+.rb-blast {
   position: fixed;
   inset: 0;
   z-index: -1;
-  width: 100%;
-  height: 100%;
   pointer-events: none;
-  image-rendering: pixelated;
+}
+
+/* React Bits BorderGlow on the lead project. The glow stays; the vendored
+   elevation stack and its default hairline go, so the card sits on this flat,
+   border-led surface instead of floating above it. */
+.work-lead.border-glow-card {
+  border: none;
+  box-shadow: none;
+}
+
+/* React Bits SpecularButton on the contact actions. The vendored elevation and
+   backdrop go, the sizing takes the site's control step, and the focus ring is
+   the site's signal colour. */
+.contact-action.specular-button {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  justify-content: center;
+  border: 1px solid var(--line-strong);
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.contact-action .specular-button__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.contact-action.specular-button:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+}
+
+@media (min-width: 40rem) {
+  .contact-action.specular-button {
+    width: auto;
+    justify-content: flex-start;
+  }
+}
+
+/* The React Bits SlingButton as back-to-top, in the thumb zone. It fades in
+   once the visitor is a screen down. */
+.back-to-top {
+  position: fixed;
+  inset-block-end: max(1.25rem, env(safe-area-inset-bottom, 0px));
+  inset-inline-end: max(1.25rem, env(safe-area-inset-right, 0px));
+  z-index: 20;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 200ms ease, visibility 200ms ease;
+}
+
+.back-to-top.is-shown {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .back-to-top {
+    transition-duration: 0.01ms;
+  }
+}
+
+/* The display face for the large headings, on top of the Plex pair. */
+.display-face {
+  font-family: var(--font-display-stack), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* The home title. React Bits TechText draws the name on a canvas sized to this
+   box; the <h1> around it carries the text, so the canvas is decoration. */
+.home-title {
+  display: block;
+}
+
+.tech-name {
+  display: block;
+  height: clamp(3.5rem, 2rem + 7vw, 5.75rem);
 }
 
 /*

@@ -8,7 +8,19 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { CLAIM, CURRENT, DISCIPLINES, FIELD_REPORT, NAME, ROLE, SECTIONS } from "./content";
+import type { IconSvgElement } from "@hugeicons/react";
+import {
+  AiBrain01Icon,
+  Database01Icon,
+  Factory01Icon,
+  RoboticIcon,
+  Rocket01Icon,
+} from "@hugeicons/core-free-icons";
 import { CompactNav, PixelCta, RailNav, ThemeToggle } from "./components";
+import { IconMark } from "./icon-mark";
+import { TechName } from "./tech-name";
+import { displayFamily } from "./fonts";
+import { SpecularAction } from "./specular-action";
 
 function cls(...args: (string | false | undefined | null)[]) {
   return args.filter(Boolean).join(" ");
@@ -127,7 +139,7 @@ export function PageHeader({
         <span className="px-2 text-line-strong" aria-hidden="true">/</span>
         {label}
       </p>
-      <h1 className="console-chunk mt-3 text-3xl font-semibold leading-[1.1] tracking-tight text-ink md:text-4xl">
+      <h1 className="console-chunk display-face mt-3 text-4xl font-semibold leading-[1.05] text-ink md:text-5xl">
         {title}
       </h1>
       <p className="console-chunk body-text measure mt-4 text-ink-2">{lede}</p>
@@ -188,8 +200,13 @@ export function HomeHeader() {
           {DISCIPLINES}
         </p>
 
-        <h1 className="console-chunk mt-4 text-3xl font-semibold leading-[1.1] tracking-tight text-accent md:text-4xl">
-          {NAME}
+        {/* The name, drawn by React Bits TechText. The h1 carries the text for
+            assistive tech; the canvas beneath it is decoration. */}
+        <h1 className="console-chunk home-title mt-4">
+          <span className="sr-only">{NAME}</span>
+          <span aria-hidden="true" className="tech-name">
+            <TechName text={NAME} family={displayFamily} />
+          </span>
         </h1>
 
         <p className="console-chunk body-text measure mt-5 text-ink-2">{CLAIM}</p>
@@ -322,6 +339,7 @@ export function Row({
   detail,
   tags,
   status,
+  mark,
   href,
 }: {
   title: string;
@@ -329,6 +347,7 @@ export function Row({
   detail?: string;
   tags?: readonly string[];
   status?: { tone: Tone; label: string };
+  mark?: IconSvgElement;
   href?: string;
 }) {
   /* Only a link that leaves the site opens a new tab, and only that kind gets the
@@ -373,7 +392,10 @@ export function Row({
   const body = (
     <>
       <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
-        <h3 className="text-lg font-semibold text-ink">{titleNode}</h3>
+        <h3 className="flex items-center gap-2.5 text-lg font-semibold text-ink">
+          {mark && <IconMark icon={mark} className="h-4 w-4 shrink-0 text-ink-3" />}
+          {titleNode}
+        </h3>
         {meta && <span className="mono shrink-0 text-[11px] text-ink-3">{meta}</span>}
       </div>
       {detail && <p className="body-text measure mt-1.5 text-ink-2">{detail}</p>}
@@ -432,6 +454,14 @@ export function NumberedIndex({
    Grouped by layer rather than inventoried per technology. A twenty-row vendor
    list buries the shape of the system. */
 
+const LAYER_ICON: Record<string, IconSvgElement> = {
+  Agents: RoboticIcon,
+  Models: AiBrain01Icon,
+  Retrieval: Database01Icon,
+  "Plant data": Factory01Icon,
+  Delivery: Rocket01Icon,
+};
+
 export function StackMap({
   layers,
 }: {
@@ -444,7 +474,10 @@ export function StackMap({
           key={l.layer}
           className="grid gap-x-6 gap-y-1.5 sm:grid-cols-[7rem_1fr]"
         >
-          <dt className="mono text-[11px] uppercase tracking-[0.12em] text-ink-3">{l.layer}</dt>
+          <dt className="mono flex items-center gap-2 text-[11px] uppercase tracking-[0.12em] text-ink-3">
+            {LAYER_ICON[l.layer] && <IconMark icon={LAYER_ICON[l.layer]} className="h-3.5 w-3.5" />}
+            {l.layer}
+          </dt>
           <dd className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
             {l.items.map((i) => (
               <span key={i.name} className="inline-flex items-baseline gap-1.5 text-sm text-ink-2">
@@ -477,15 +510,11 @@ export function ContactAction({
   external?: boolean;
 }) {
   return (
-    <a
-      href={href}
-      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-      className="press inline-flex min-h-11 w-full items-center justify-center gap-2 border border-line-strong bg-panel px-4 text-sm text-ink-2 hover:border-ink-3 hover:text-ink active:translate-y-px sm:w-auto sm:justify-start"
-    >
+    <SpecularAction href={href} external={external}>
       {icon}
       {label}
       {external && <span className="sr-only"> (opens in a new tab)</span>}
-    </a>
+    </SpecularAction>
   );
 }
 

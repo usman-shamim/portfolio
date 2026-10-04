@@ -14,9 +14,27 @@ import {
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
+  type ReactElement,
   type ReactNode,
 } from "react";
+import type { IconSvgElement } from "@hugeicons/react";
+import {
+  Call02Icon,
+  CodeCircleIcon,
+  RoboticIcon,
+  WorkflowCircle01Icon,
+} from "@hugeicons/core-free-icons";
 import { SECTIONS, type Section } from "./content";
+import LineSidebarRaw from "./rb/LineSidebar";
+import { IconMark } from "./icon-mark";
+import { SpecularAction } from "./specular-action";
+
+/* The vendored component ships as .jsx, so its props are inferred from its own
+   defaults (items: string[], activeIndex: null). Cast once to the shape this
+   site passes rather than casting at the call site. */
+const LineSidebar = LineSidebarRaw as unknown as (
+  props: Record<string, unknown>
+) => ReactElement;
 
 function cls(...args: (string | false | undefined | null)[]) {
   return args.filter(Boolean).join(" ");
@@ -108,32 +126,29 @@ function ChevronDown({ className = "h-3 w-3" }: { className?: string }) {
 
 export function RailNav() {
   const pathname = usePathname();
+  const active = SECTIONS.findIndex((s: Section) => isActive(pathname, s.slug));
 
+  /* React Bits LineSidebar carries the rail's routes on desktop. Its proximity
+     effect colours and nudges the item nearest the cursor; the active route is
+     driven from the pathname so the current section is always marked. */
   return (
-    <nav aria-label="Sections" className="gutter">
-      <ul>
-        {SECTIONS.map((s: Section) => {
-          const active = isActive(pathname, s.slug);
-          return (
-            <li key={s.slug}>
-              <Link
-                href={`/${s.slug}`}
-                aria-current={active ? "page" : undefined}
-                className={cls(
-                  "press flex min-h-11 items-center gap-3 border-s-2 ps-2.5 pe-2 text-sm active:translate-y-px",
-                  active
-                    ? "border-signal text-ink"
-                    : "border-transparent text-ink-3 hover:border-line-strong hover:text-ink-2"
-                )}
-              >
-                <span className="mono text-[11px] text-ink-3">{s.index}</span>
-                {s.label}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
+    <div className="gutter">
+      <LineSidebar
+        ariaLabel="Sections"
+        items={SECTIONS.map((s: Section) => ({ label: s.label, href: `/${s.slug}` }))}
+        activeIndex={active}
+        accentColor="var(--ink-2)"
+        textColor="var(--ink-3)"
+        markerColor="var(--line-strong)"
+        fontSize={0.9}
+        itemGap={13}
+        maxShift={9}
+        proximityRadius={64}
+        markerLength={16}
+        showIndex
+        showMarker
+      />
+    </div>
   );
 }
 
@@ -271,7 +286,15 @@ export function CompactNav() {
 
 /* ── Services ──
    An index rather than a grid of equal cards. The number and name carry the
-   weight on the left, the terms sit on the right, spacing does the separating. */
+   weight on the left, the terms sit on the right, spacing does the separating.
+   One Hugeicons mark per service, in the label tone. */
+
+const SERVICE_ICON: Record<string, IconSvgElement> = {
+  "AI agents": RoboticIcon,
+  "Workflow automation": WorkflowCircle01Icon,
+  "Web development": CodeCircleIcon,
+  "Voice receptionist": Call02Icon,
+};
 
 export function ServicesList({
   items,
@@ -304,8 +327,9 @@ export function ServicesList({
           key={s.name}
           className="grid gap-x-8 gap-y-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]"
         >
-          <div className="flex items-baseline gap-3">
+          <div className="flex items-center gap-3">
             <span className="mono text-[11px] text-ink-3">{String(i + 1).padStart(2, "0")}</span>
+            <IconMark icon={SERVICE_ICON[s.name]} className="h-[18px] w-[18px] shrink-0 text-ink-3" />
             <h3 className="text-lg font-semibold text-ink">{s.name}</h3>
           </div>
           <div>
@@ -368,16 +392,7 @@ export function CopyEmail({ address }: { address: string }) {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={copy}
-        className={cls(
-          "press inline-flex min-h-11 w-full items-center justify-center gap-2 border px-4 text-sm sm:w-auto sm:justify-start",
-          state === "failed"
-            ? "border-alert bg-panel text-alert"
-            : "border-line-strong bg-panel text-ink-2 hover:border-ink-3 hover:text-ink active:translate-y-px"
-        )}
-      >
+      <SpecularAction onClick={copy} tone={state === "failed" ? "alert" : "normal"}>
         {/* Both glyphs stay mounted and cross-fade, so the change reads as one
             icon becoming another rather than a swap. */}
         <span className="icon-swap h-4 w-4" aria-hidden="true">
@@ -385,7 +400,7 @@ export function CopyEmail({ address }: { address: string }) {
           <CheckIcon className={cls("absolute inset-0 h-4 w-4", state !== "copied" && "is-off")} />
         </span>
         {label}
-      </button>
+      </SpecularAction>
 
       {/* Present from first paint so the change is announced, not missed. */}
       <span aria-live="polite" className="sr-only">
@@ -401,172 +416,6 @@ export function CopyEmail({ address }: { address: string }) {
       )}
     </>
   );
-}
-
-/* ── The field ──
-
-   The background this replaces was a grid of straight lines: it marked the rail's
-   module, but it also made the whole page feel boxed and ruled. This is the opposite
-   instrument — a soft, curved glow drawn in visible square cells.
-
-   The technique is ordered dithering. A smooth radial falloff is quantised against an
-   8x8 Bayer matrix, which turns one continuous shape into a field of discrete cells
-   whose density carries the shape. That is the site's own discipline made visible in
-   the background: the same low-contrast restraint as the rules, but round instead of
-   straight, and it drifts by one cell every couple of seconds so the page breathes
-   without any element moving.
-
-   The palette is hardcoded from painted-pixel measurements of the live tokens, not
-   read from the CSS variables, because a canvas needs an RGB string and the engine
-   reports the OKLCH tokens back as lab(). The brightest tone is capped well under the
-   ink, so any text that lands over the field keeps the contrast it is measured
-   against elsewhere.
-
-   It is one canvas, painted at cell resolution and upscaled with
-   `image-rendering: pixelated`, so the cells are crisp squares rather than a blur.
-   Nothing here animates per frame: a single interval moves the blob a few cells at a
-   time, which is what makes the drift read as 8-bit rather than as a video. Under
-   `prefers-reduced-motion` the interval never starts and the field holds still. Under
-   `prefers-contrast: more` it is removed entirely, because texture can only work
-   against legibility there. */
-
-const FIELD_CELL = 8;
-
-/*
-  Measured from the painted surfaces, not copied from the token file, so they are
-  what the browser actually produced. Dark ground is rgb(21,18,15) and the light
-  ground is rgb(249,246,243); the four tones step upward from each, and the top tone
-  stays far enough from the ink that text keeps its measured contrast on top of the
-  field.
-*/
-const FIELD_PALETTES = {
-  dark: {
-    ground: "#15120f",
-    tones: ["#1a1611", "#221d17", "#2d261d", "#3b3126"],
-  },
-  light: {
-    ground: "#f9f6f3",
-    tones: ["#f2efea", "#e9e4dc", "#dcd5cb", "#c9c0b3"],
-  },
-};
-
-/* The canonical 8x8 Bayer matrix. Each cell's threshold decides whether it lifts to
-   the next tone at that brightness, which is what turns a gradient into ordered
-   pixels instead of banding. */
-const BAYER8 = [
-   0, 32,  8, 40,  2, 34, 10, 42,
-  48, 16, 56, 24, 50, 18, 58, 26,
-  12, 44,  4, 36, 14, 46,  6, 38,
-  60, 28, 52, 20, 62, 30, 54, 22,
-   3, 35, 11, 43,  1, 33,  9, 41,
-  51, 19, 59, 27, 49, 17, 57, 25,
-  15, 47,  7, 39, 13, 45,  5, 37,
-  63, 31, 55, 23, 61, 29, 53, 21,
-];
-
-const smoothstep = (v: number) => v * v * (3 - 2 * v);
-
-function paintField(canvas: HTMLCanvasElement, theme: "dark" | "light", phase: number) {
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
-
-  const w = Math.max(1, Math.ceil(window.innerWidth / FIELD_CELL));
-  const h = Math.max(1, Math.ceil(window.innerHeight / FIELD_CELL));
-  if (canvas.width !== w) canvas.width = w;
-  if (canvas.height !== h) canvas.height = h;
-
-  const pal = FIELD_PALETTES[theme];
-  const tones = pal.tones;
-  const S = tones.length;
-
-  ctx.fillStyle = pal.ground;
-  ctx.fillRect(0, 0, w, h);
-
-  /* Two blobs rather than one, so the glow has a pull across the page instead of
-     sitting dead centre. The dominant one sits up and to the right of the hero; a
-     dimmer counterweight hangs low on the rail side. */
-  const t = phase * 0.55;
-  const blobs = [
-    { x: 0.74 + 0.030 * Math.cos(t), y: 0.24 + 0.024 * Math.sin(t * 1.3), r: 0.62, k: 1 },
-    { x: 0.12 + 0.020 * Math.cos(t * 0.7 + 2.1), y: 0.84 + 0.026 * Math.sin(t * 0.9 + 0.6), r: 0.4, k: 0.55 },
-  ];
-  const aspect = w / h;
-
-  for (let y = 0; y < h; y++) {
-    const ny = (y + 0.5) / h;
-    for (let x = 0; x < w; x++) {
-      const nx = (x + 0.5) / w;
-      let v = 0;
-      for (const b of blobs) {
-        const d = Math.hypot((nx - b.x) * aspect, ny - b.y);
-        const u = 1 - Math.min(1, d / b.r);
-        if (u > 0) v += smoothstep(u) * b.k;
-      }
-      if (v <= 0.004) continue;
-      if (v > 1) v = 1;
-      const th = (BAYER8[(y & 7) * 8 + (x & 7)] + 0.5) / 64;
-      const lit = Math.floor(v * S + th);
-      if (lit <= 0) continue;
-      ctx.fillStyle = tones[Math.min(lit - 1, S - 1)];
-      ctx.fillRect(x, y, 1, 1);
-    }
-  }
-}
-
-export function PixelField() {
-  const ref = useRef<HTMLCanvasElement | null>(null);
-
-  useEffect(() => {
-    const canvas = ref.current;
-    if (!canvas) return;
-
-    const theme = () => (document.documentElement.dataset.theme === "light" ? "light" : "dark");
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-
-    let phase = 0;
-    const draw = () => paintField(canvas, theme(), phase);
-    draw();
-
-    let timer: number | undefined;
-    const stop = () => {
-      if (timer !== undefined) {
-        window.clearInterval(timer);
-        timer = undefined;
-      }
-    };
-    const start = () => {
-      if (reduce.matches || timer !== undefined) return;
-      timer = window.setInterval(() => {
-        if (document.hidden) return;
-        phase += 1;
-        draw();
-      }, 2200);
-    };
-    start();
-
-    const onMotion = () => (reduce.matches ? stop() : start());
-    reduce.addEventListener("change", onMotion);
-
-    let resizeTimer: number | undefined;
-    const onResize = () => {
-      window.clearTimeout(resizeTimer);
-      resizeTimer = window.setTimeout(draw, 200);
-    };
-    window.addEventListener("resize", onResize);
-
-    const observer = new MutationObserver(draw);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
-
-    return () => {
-      stop();
-      reduce.removeEventListener("change", onMotion);
-      window.clearTimeout(resizeTimer);
-      window.removeEventListener("resize", onResize);
-      observer.disconnect();
-    };
-  }, []);
-
-  return <canvas ref={ref} className="pixel-field" aria-hidden="true" />;
 }
 
 /* ── Pixel CTA ──
@@ -676,8 +525,8 @@ class Pixel {
 }
 
 const CTA_CLASS: Record<"primary" | "secondary", string> = {
-  primary: "border-ink bg-ink text-ground hover:border-ink-2 hover:bg-ink-2",
-  secondary: "border-line-strong text-ink-2 hover:border-ink-3 hover:text-ink",
+  primary: "border-accent bg-accent text-ground hover:brightness-110",
+  secondary: "border-line-strong text-ink-2 hover:border-accent hover:text-ink",
 };
 
 export function PixelCta({
@@ -782,7 +631,7 @@ export function PixelCta({
       onFocus={enter}
       onBlur={leave}
       className={cls(
-        "press relative inline-flex min-h-11 w-full items-center justify-center overflow-hidden border px-4 text-sm font-medium active:translate-y-px sm:w-auto",
+        "press relative inline-flex min-h-11 w-full items-center justify-center overflow-hidden rounded-lg border px-5 text-sm font-medium active:translate-y-px sm:w-auto",
         CTA_CLASS[variant]
       )}
     >
